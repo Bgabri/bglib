@@ -1,0 +1,29 @@
+{
+	"disableFormatting": false,
+    "indentation": {
+		"indentObjectLiteral": true,
+        "tabWidth": 4,
+        "character": "    "
+    },
+    "lineEnds": {
+        "blockCurly": {
+            "leftCurly": "after",
+            "emptyCurly": "noBreak"
+        }
+    },
+    "sameLine": {
+        "ifBody": "same",
+        "elseBody": "same",
+        "ifElse": "same",
+        "elseIf": "same",
+        "expressionIf": "same",
+        "expressionIfWithBlocks": false,
+        "functionBody": "same",
+        "anonFunctionBody": "same"
+    },
+    "whitespace": {
+    },
+    "wrapping": {
+        "maxLineLength": 80
+    }
+}

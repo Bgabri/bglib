@@ -1,0 +1,19 @@
+# folders
+.DS_Store
+.vscode
+.zed
+
+bin
+**/.tmp
+design
+dump
+result
+/shaders
+
+# files
+hlprofile.dump
+js_exports.txt
+js_externs.txt
+js_imports.txt
+*.nix
+Makefile
