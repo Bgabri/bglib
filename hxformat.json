@@ -1,7 +1,7 @@
 {
-	"disableFormatting": false,
+    "disableFormatting": false,
     "indentation": {
-		"indentObjectLiteral": true,
+        "indentObjectLiteral": true,
         "tabWidth": 4,
         "character": "    "
     },

@@ -1,35 +1,65 @@
 package utils;
+using Lambda;
 
+/**
+ * A utility class which defines useful functions on primitives.
+ **/
 class PrimitiveTools {
 
+    /**
+     * Repeats a string up to the given length.
+     * @param str to repeat
+     * @param length of the final string
+     * @return String
+     **/
     public static inline function repeat(str:String, length:Int):String {
         var s = "";
         while (s.length < length) s += str;
         return s.substr(0, length);
     }
 
+    /**
+     * Inserts a character at the given index.
+     * @param str to modify
+     * @param index of the character
+     * @param c to insert
+     * @return String
+     **/
     public static inline function insert(
         str:String, index:Int, c:String
     ):String {
         return str.substring(0, index) + c + str.substring(index);
     }
 
+    /**
+     * Replaces a character at the given index.
+     * @param str to modify
+     * @param index of the character
+     * @param c to replace
+     * @return String
+     **/
     public static inline function replace(
         str:String, index:Int, c:String
     ):String {
         return str.substring(0, index) + c + str.substring(index+c.length);
     }
 
+    /**
+     * Removes a character at the given index.
+     * @param str to modify
+     * @param index of the character
+     * @param c to remove
+     * @return String
+     **/
     public static inline function remove(str:String, index:Int):String {
         return str.substring(0, index) + str.substring(index+1);
     }
 
-    // public static inline function flatten(arr:Array<String>):String {
-    //     var s = "";
-    //     for (v in arr) s += v;
-    //     return s;
-    // }
-
+    /**
+     * Finds the maximum element in the array.
+     * @param arr to filter
+     * @return T max
+     **/
     public static function max<T:Float>(arr:Array<T>):T {
         var maxV:T = arr[0];
         for (v in arr) {
@@ -38,6 +68,11 @@ class PrimitiveTools {
         return maxV;
     }
 
+    /**
+     * Finds the minimum element in the array.
+     * @param arr to filter
+     * @return T min
+     **/
     public static function min<T:Float>(arr:Array<T>):T {
         var minV:T = arr[0];
         for (v in arr) {
@@ -46,16 +81,33 @@ class PrimitiveTools {
         return minV;
     }
 
+    /**
+     * Returns true only if any of the elements are true.
+     * @param arr to filter
+     * @param f map
+     * @return Bool
+     **/
     public static function any<T>(arr:Array<T>, f:T -> Bool):Bool {
         for (v in arr) if (f(v)) return true;
         return false;
     }
 
+    /**
+     * Returns true only if all of the elements are true.
+     * @param arr to filter
+     * @param f map
+     * @return Bool
+     **/
     public static function all<T>(arr:Array<T>, f:T -> Bool):Bool {
         for (v in arr) if (!f(v)) return false;
         return true;
     }
 
+    /**
+     * Shallow copy of a 2d array.
+     * @param a the matrix
+     * @return Array<Array<T>>
+     **/
     public static function clone<T>(a:Array<Array<T>>):Array<Array<T>> {
         var n:Array<Array<T>> = [];
         for (y in 0...a.length) {
@@ -67,9 +119,16 @@ class PrimitiveTools {
         return n;
     }
 
-
-    public static function prettyPrint<T, S>(arr:Array<Array<T>>, ?map: T -> S , delim = " ") {
-
+    /**
+     * Prints out a matrix with a nice styling, 
+     * works best with character matrix.
+     * @param arr to print
+     * @param map elements
+     * @param delim = " " the spacing between elements
+     **/
+    public static function prettyPrint<T, S>(
+        arr:Array<Array<T>>, ?map: T -> S, delim = " "
+    ) {
         var buffer:StringBuf = new StringBuf();
         var length = arr[0].length;
         var spacing = repeat(" ", Math.floor(Utils.logb(10, arr.length)));

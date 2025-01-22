@@ -1,6 +1,9 @@
 import hxd.Res;
 import h3d.mat.PbrMaterialSetup;
 
+/**
+ * Entry point, demo of a basic 3d scene.
+ **/
 class Main extends Game {
     public function new() {
         h3d.mat.MaterialSetup.current = new PbrMaterialSetup();

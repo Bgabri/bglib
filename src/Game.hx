@@ -10,6 +10,9 @@ import h2d.Tile;
 import h2d.Bitmap;
 import h3d.mat.Texture;
 
+/**
+ * The base game class with basic quick add ui elements and pixelization.
+ **/
 class Game extends hxd.App {
     var fps:h2d.HtmlText;
     var drawCalls:h2d.Text;
@@ -30,7 +33,7 @@ class Game extends hxd.App {
         var h = Math.floor(engine.height / pxScale);
 
         // shader which limits the number of colours drawn;
-        var palletShader = new shaders.Palette(hxd.Res.pear36.toTexture());
+        var paletteShader = new shaders.Palette(hxd.Res.pear36.toTexture());
 
         // draw the renderTarget in s2d
         renderTargetBitmap = new Bitmap(s2d);
@@ -39,7 +42,7 @@ class Game extends hxd.App {
         setScale();
 
         s2d.filter = new Nothing(); // pixel perfection!
-        s2d.filter = new h2d.filter.Shader(palletShader);
+        s2d.filter = new h2d.filter.Shader(paletteShader);
 
         fui = new h2d.Flow(s2d); // s2d
         fui.layout = Vertical;
