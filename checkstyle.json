@@ -106,11 +106,12 @@
                     "max": 1,
                     "skipSingleLineTypes": true,
                     "defaultPolicy": "ignore",
-                    "ignore": [],
+                    "ignore": [
+                         "beforeUsing",
+                         "betweenImports"
+                    ],
                     "none": [
                          "beforePackage",
-                         "betweenImports",
-                         "beforeUsing",
                          "typeDefinition",
                          "afterLeftCurly",
                          "beforeRightCurly"

@@ -1,5 +1,13 @@
 {
     "disableFormatting": false,
+    "emptyLines": {
+        "importAndUsing": {
+			"beforeType": 1,
+			"beforeUsing": 1,
+			"betweenImports": 1,
+			"betweenImportsLevel": "firstLevelPackage"
+		}
+    }, 
     "indentation": {
         "indentObjectLiteral": true,
         "tabWidth": 4,
@@ -21,9 +29,47 @@
         "functionBody": "same",
         "anonFunctionBody": "same"
     },
-    "whitespace": {
-    },
+    "whitespace": {},
     "wrapping": {
-        "maxLineLength": 80
+        "maxLineLength": 80,
+
+        "callParameter": {
+            "defaultWrap": "noWrap",
+            "rules": [
+                {
+                    "conditions": [
+                        {
+                            "cond": "exceedsMaxLineLength",
+                            "value": 1
+                        }
+                    ],
+                    "type": "fillLineWithLeadingBreak"
+                }
+            ]
+        },
+        "functionSignature": {
+            "defaultAdditionalIndent": 1,
+            "defaultWrap": "noWrap",
+            "rules": [
+                {
+                    "conditions": [
+                        {
+                            "cond": "itemCount >= n",
+                            "value": 8
+                        }
+                    ],
+                    "type": "onePerLine"
+                },
+                {
+                    "conditions": [
+                        {
+                            "cond": "exceedsMaxLineLength",
+                            "value": 1
+                        }
+                    ],
+                    "type": "fillLineWithLeadingBreak"
+                }
+            ]
+        }
     }
 }
