@@ -1,5 +1,0 @@
-buildCommon.hxml
-
--js bin/game.js
-
---dce full

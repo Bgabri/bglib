@@ -1,0 +1,14 @@
+{
+    "name": "bglib",
+    "description": "A library of useful classes and functions for Haxe",
+    "version": "0.1.0",
+    "license": "MIT",
+    "releasenote": "intial release",
+    "contributors": [
+        "bgabri"
+    ],
+    "dependencies": {
+        "tink_cli": "",
+        "heaps": ""
+    }
+}
