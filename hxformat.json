@@ -2,12 +2,12 @@
     "disableFormatting": false,
     "emptyLines": {
         "importAndUsing": {
-			"beforeType": 1,
-			"beforeUsing": 1,
-			"betweenImports": 1,
-			"betweenImportsLevel": "firstLevelPackage"
-		}
-    }, 
+            "beforeType": 1,
+            "beforeUsing": 1,
+            "betweenImports": 1,
+            "betweenImportsLevel": "firstLevelPackage"
+        }
+    },
     "indentation": {
         "indentObjectLiteral": true,
         "tabWidth": 4,
@@ -32,10 +32,27 @@
     "whitespace": {},
     "wrapping": {
         "maxLineLength": 80,
-
         "callParameter": {
             "defaultWrap": "noWrap",
             "rules": [
+                {
+                    "conditions": [
+                        {
+                            "cond": "itemCount <= n",
+                            "value": 0
+                        }
+                    ],
+                    "type": "noWrap"
+                },
+                {
+                    "conditions": [
+                        {
+                            "cond": "allItemLengths <= n",
+                            "value": 30
+                        }
+                    ],
+                    "type": "noWrap"
+                },
                 {
                     "conditions": [
                         {
@@ -68,6 +85,73 @@
                         }
                     ],
                     "type": "fillLineWithLeadingBreak"
+                }
+            ]
+        },
+        "methodChain": {
+            "defaultWrap": "onePerLineAfterFirst",
+            "rules": [
+                {
+                    "conditions": [
+                        {
+                            "cond": "itemCount <= n",
+                            "value": 2
+                        },
+                        {
+                            "cond": "exceedsMaxLineLength",
+                            "value": 0
+                        }
+                    ],
+                    "type": "noWrap"
+                },
+                {
+                    "conditions": [
+                        {
+                            "cond": "exceedsMaxLineLength",
+                            "value": 1
+                        }
+                    ],
+                    "type": "onePerLineAfterFirst"
+                }
+            ]
+        },
+        "multiVar": {
+            "defaultWrap": "onePerLine"
+        },
+        "opAddSubChain": {
+            "defaultWrap": "noWrap",
+            "rules": [
+                {
+                    "conditions": [
+                        {
+                            "cond": "exceedsMaxLineLength",
+                            "value": 1
+                        }
+                    ],
+                    "type": "onePerLine"
+                }
+            ]
+        },
+        "opBoolChain": {
+            "defaultWrap": "noWrap",
+            "rules": [
+                {
+                    "conditions": [
+                        {
+                            "cond": "itemCount >= n",
+                            "value": 4
+                        }
+                    ],
+                    "type": "onePerLine"
+                },
+                {
+                    "conditions": [
+                        {
+                            "cond": "exceedsMaxLineLength",
+                            "value": 1
+                        }
+                    ],
+                    "type": "onePerLine"
                 }
             ]
         }

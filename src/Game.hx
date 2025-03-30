@@ -3,11 +3,14 @@ import h2d.Interactive;
 import h2d.Slider;
 import h2d.Flow;
 import h2d.Font;
+
 import fonts.BgFont2;
+
 import h2d.filter.Nothing;
 import h2d.Graphics;
 import h2d.Tile;
 import h2d.Bitmap;
+
 import h3d.mat.Texture;
 
 /**
@@ -149,7 +152,7 @@ class Game extends hxd.App {
     function mouseMoved(event:hxd.Event) {}
 
     // from sampleApp
-    function addButton(label:String, onClick:Void -> Void):Flow {
+    function addButton(label:String, onClick:Void->Void):Flow {
         var f = new h2d.Flow(fui);
         f.padding = 5;
         f.paddingBottom = 7;
@@ -158,15 +161,19 @@ class Game extends hxd.App {
         tf.text = label;
         f.enableInteractive = true;
         f.interactive.cursor = Button;
-        f.interactive.onClick =  (_) -> onClick();
-        f.interactive.onOver = (_) -> f.backgroundTile = Tile.fromColor(0x606060);
-        f.interactive.onOut = (_) -> f.backgroundTile = Tile.fromColor(0x404040);
+        f.interactive.onClick = (_) -> onClick();
+        f.interactive.onOver = (_) -> {
+            f.backgroundTile = Tile.fromColor(0x606060);
+        };
+        f.interactive.onOut = (_) -> {
+            f.backgroundTile = Tile.fromColor(0x404040);
+        };
         return f;
     }
 
     function addSlider(
-        label:String, get:Void -> Float, set:Float -> Void,
-        min:Float = 0., max:Float = 1.
+        label:String, get:Void->Float, set:Float->Void, min:Float = 0.,
+        max:Float = 1.
     ):Slider {
         var f = new h2d.Flow(fui);
 
@@ -199,8 +206,14 @@ class Game extends hxd.App {
     }
 
     function addGraph(
-        x1:Int, y1:Int, x2:Int, y2:Int, get:Void->Float,
-        scaleX:Float = 1, scaleY:Float = 1, graphColor = 0x0000FF,
+        x1:Int,
+        y1:Int,
+        x2:Int,
+        y2:Int,
+        get:Void->Float,
+        scaleX:Float = 1,
+        scaleY:Float = 1,
+        graphColor = 0x0000FF,
         axisColor = 0x888888
     ):() -> Void {
         var graph = new Graphics(s2d);
@@ -224,7 +237,7 @@ class Game extends hxd.App {
     }
 
     function addCheck(
-        label:String, get:Void -> Bool, set:Bool -> Void
+        label:String, get:Void->Bool, set:Bool->Void
     ):Interactive {
         var f = new h2d.Flow(fui);
 
@@ -258,7 +271,7 @@ class Game extends hxd.App {
     }
 
     function addChoice(
-        text, choices, callback:Int -> Void, value = 0
+        text, choices, callback:Int->Void, value = 0
     ):Interactive {
         var font = getFont();
         var i = new h2d.Interactive(110, font.lineHeight, fui);
