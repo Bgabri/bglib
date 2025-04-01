@@ -1,0 +1,4 @@
+-cp src
+-lib tink_cli
+-lib bglib
+--debug
