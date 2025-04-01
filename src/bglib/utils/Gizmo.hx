@@ -1,4 +1,4 @@
-package utils;
+package bglib.utils;
 
 import h3d.scene.Graphics;
 
