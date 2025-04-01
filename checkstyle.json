@@ -255,8 +255,8 @@
                     "intervalOpPolicy": "none",
                     "arrowPolicy": "around",
                     "arrowFunctionPolicy": "ignore",
-                    "oldFunctionTypePolicy": "around",
-                    "newFunctionTypePolicy": "none"
+                    "oldFunctionTypePolicy": "none",
+                    "newFunctionTypePolicy": "around"
                }
           },
           {
