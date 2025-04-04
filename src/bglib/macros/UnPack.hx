@@ -8,6 +8,9 @@ using StringTools;
 
 using haxe.macro.ExprTools;
 
+/**
+ * Macro which unpacks an array or struct of arguments into a function call.
+**/
 class UnPack {
     #if macro
     static function getType(t:haxe.macro.Type):String {
@@ -20,33 +23,42 @@ class UnPack {
                 return null;
         }
     }
-    #end
 
-    static function arrUnpack(fn:Expr, args:Expr):Array<Expr> {
-        var eargs:Array<Expr> = [];
-        #if macro
+    static function arrUnpack(fn:Expr, args:Expr):Expr {
+        var expr = macro fn();
+        var fnArgs = [];
+
         switch (Context.typeof(fn)) {
-            case TFun(fargs, ret):
-                for (i in 0...fargs.length) {
-                    if (getType(fargs[i].t) == "haxe.Rest") {
-                        // eargs.push(macro ${args}.slice($v{i}));
-                        Context.error(
-                            "Cannot unpack variable arguments", fn.pos
-                        );
-                    } else {
-                        eargs.push(macro ${args}[$v{i}]);
-                    }
-                }
+            case TFun(fArgs, ret):
+                fnArgs = fArgs;
             default:
                 Context.error("Expected a function", fn.pos);
         }
-        #end
-        return eargs;
+
+        var requiredArgs = 0;
+        var eArgs:Array<Expr> = [];
+        for (i in 0...fnArgs.length) {
+            var arg = fnArgs[i];
+            if (getType(arg.t) == "haxe.Rest") {
+                Context.error("Cannot unpack variable arguments", fn.pos);
+            }
+            if (!arg.opt) requiredArgs++;
+            eArgs.push(macro ${args}[$v{i}]);
+        }
+
+        expr.expr = ECall(fn, eArgs);
+        var pos = args.pos;
+        return macro {
+            if (${args}.length < $v{requiredArgs}) {
+                throw new haxe.Exception("Not enough unpacking arguments");
+            }
+            $expr;
+        };
     }
 
-    static function structUnpack(fn:Expr, st:Expr):Array<Expr> {
+    static function structUnpack(fn:Expr, st:Expr):Expr {
+        var expr = macro fn();
         var eargs:Array<Expr> = [];
-        #if macro
         switch (Context.typeof(fn)) {
             case TFun(fargs, ret):
                 for (i in 0...fargs.length) {
@@ -56,9 +68,10 @@ class UnPack {
             default:
                 Context.error("Expected a function", fn.pos);
         }
-        #end
-        return eargs;
+        expr.expr = ECall(fn, eargs);
+        return expr;
     }
+    #end
 
     /**
      * Unpacks an array of arguments into a function call.
@@ -67,21 +80,16 @@ class UnPack {
      * @return unpacked function call.
     **/
     macro static public function unpack(fn:Expr, args:Expr):Expr {
-        // trace(Context.getType("haxe./ds.Vector").getParameters()[0]);
-        // trace(Context.typeof(args);
-        var exp = macro fn();
-        var eargs:Array<Expr> = [];
-        switch (Context.typeof(args)) {
+        var exp = switch (Context.typeof(args)) {
             case TInst(_.get().name => "Array", params) |
-                TAbstract(_.get().name => "Vector", params):
-                eargs = arrUnpack(fn, args);
+                TAbstract(_.get().name => "Vector" | "Rest", params):
+                arrUnpack(fn, args);
             case TAnonymous(a):
-                eargs = structUnpack(fn, args);
+                structUnpack(fn, args);
             default:
                 Context.error("Expected struct or array like", args.pos);
         }
-        exp.expr = ECall(fn, eargs);
-        #if debug
+        #if (debug >= "2")
         @SuppressWarning("checkstyle:Trace")
         trace(exp.toString());
         #end

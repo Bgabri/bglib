@@ -7,7 +7,8 @@ class Unpacking {
         return a * b;
     }
 
-    static function multiply3(a:Int, b:Int = 10, ?c:Int):Int {
+    static function multiply3(a:Int, ?b:Int, c:Int = 10):Int {
+        if (b == null) b = 4;
         return a * b * c;
     }
 
@@ -21,7 +22,7 @@ class Unpacking {
 
     static function main() {
         var as:Array<Int> = [2, 5, 7];
-        trace(UnPack.unpack(multiply, as));
+        trace(multiply.unpack(as));
         var as:haxe.ds.Vector<Int> = new haxe.ds.Vector(2, 2);
         trace(UnPack.unpack(multiply, as));
         var as = {
@@ -29,5 +30,8 @@ class Unpacking {
             b: 5
         };
         trace(UnPack.unpack(multiply, as));
+        var as = [1];
+        trace(multiply3.unpack(as));
+        trace(multiply.unpack(as)); // exception
     }
 }
