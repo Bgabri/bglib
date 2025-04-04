@@ -18,6 +18,7 @@ typedef DocString = {
 }
 
 /**
+ * TODO: make this a macro
  * Helper class for building Doc.
 **/
 class DocBuilder {
@@ -48,12 +49,16 @@ class DocBuilder {
         return this;
     }
 
-    public function setFlagParamDescriptor(flagParamDescriptor:Bool):DocBuilder {
+    public function setFlagParamDescriptor(
+        flagParamDescriptor:Bool
+    ):DocBuilder {
         doc.flagParamDescriptor = flagParamDescriptor;
         return this;
     }
 
-    public function setParamDescriptorDelimiter(paramDescriptorDelimiter:String):DocBuilder {
+    public function setParamDescriptorDelimiter(
+        paramDescriptorDelimiter:String
+    ):DocBuilder {
         doc.paramDescriptorDelimiter = paramDescriptorDelimiter;
         return this;
     }
@@ -144,14 +149,14 @@ class Doc implements DocFormatter<String> {
 
     function formatCommand(cmd:DocCommand):String {
         var out = "";
-        
+
         // format aliases
         if (cmd.names.length < 1) return out;
         out += cmd.names.join(aliasDelimiter);
-        
+
         var ds = extractDoc(cmd.doc);
         if (ds == null) return out + "\n";
-        
+
         // format parameters
         if (ds.params.length > 0) {
             out += ds.params.map((p) -> ' <${p.name}>').join("");
@@ -175,15 +180,15 @@ class Doc implements DocFormatter<String> {
 
     function formatFlag(flg:DocFlag):String {
         var out = "";
-        
+
         // format aliases
         var names = flg.names.concat(flg.aliases.map((a) -> '-$a'));
         if (names.length < 1) return out;
         out += names.join(aliasDelimiter);
-        
+
         var ds = extractDoc(flg.doc);
         if (ds == null) return out + "\n";
-        
+
         // format parameters
         if (ds.params.length == 1) {
             out += ' <${ds.params[0].name}>';

@@ -1,25 +1,11 @@
-import bglib.cli.Doc;
 import bglib.cli.Exit;
-import tink.Cli;
 
 /**
  * TestCli
  * Usage: cli <command> [flags]
 **/
+@:build(bglib.cli.BaseCommand.build(true))
 class TestCli {
-    function new() {}
-
-    function printHelp() {
-        var doc = Doc.builder().build();
-        Sys.print(Cli.getDoc(this, doc));
-        Sys.exit(0);
-    }
-
-    /**
-     * prints this help message
-    **/
-    public var help:Bool = false;
-
     /**
      * wow field doc
      * @param signal signal to send
@@ -42,17 +28,12 @@ class TestCli {
     @:command
     public var sub:Sub = new Sub();
 
-    /**
-     * A dummy cli.
-    **/
-    @:defaultCommand
-    public function run() {
-        if (help) printHelp();
-        Sys.println("running");
+    function cmd() {
+        Sys.println("cmd");
     }
 
-    static function main() {
-        Cli.process(Sys.args(), new TestCli()).handle(Exit.handler);
+    static function create() {
+        return new TestCli();
     }
 }
 
