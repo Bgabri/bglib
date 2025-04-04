@@ -153,7 +153,7 @@ abstract FilePath(FilePathImp) from FilePathImp to FilePathImp {
      * @param path to check against
      * @return Bool
      **/
-    @:op(a==b)
+    @:op(a == b)
     public function equals(path:FilePath):Bool {
         return this.normalized().toString() == path.normalized().toString();
     }

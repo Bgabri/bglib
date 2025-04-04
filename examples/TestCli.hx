@@ -1,4 +1,5 @@
-import haxe.Rest;
+import bglib.cli.Doc;
+import bglib.cli.Exit;
 import tink.Cli;
 
 /**
@@ -39,7 +40,7 @@ class TestCli {
      * @param _3 asdf
     **/
     @:command
-    public var sub = new Sub();
+    public var sub:Sub = new Sub();
 
     /**
      * A dummy cli.

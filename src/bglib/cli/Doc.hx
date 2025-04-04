@@ -144,12 +144,14 @@ class Doc implements DocFormatter<String> {
 
     function formatCommand(cmd:DocCommand):String {
         var out = "";
-        var ds = extractDoc(cmd.doc);
-
+        
         // format aliases
         if (cmd.names.length < 1) return out;
         out += cmd.names.join(aliasDelimiter);
-
+        
+        var ds = extractDoc(cmd.doc);
+        if (ds == null) return out + "\n";
+        
         // format parameters
         if (ds.params.length > 0) {
             out += ds.params.map((p) -> ' <${p.name}>').join("");
@@ -173,13 +175,15 @@ class Doc implements DocFormatter<String> {
 
     function formatFlag(flg:DocFlag):String {
         var out = "";
-        var ds = extractDoc(flg.doc);
-
+        
         // format aliases
         var names = flg.names.concat(flg.aliases.map((a) -> '-$a'));
         if (names.length < 1) return out;
         out += names.join(aliasDelimiter);
-
+        
+        var ds = extractDoc(flg.doc);
+        if (ds == null) return out + "\n";
+        
         // format parameters
         if (ds.params.length == 1) {
             out += ' <${ds.params[0].name}>';
