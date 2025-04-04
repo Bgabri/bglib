@@ -50,7 +50,9 @@ class UnPack {
         var pos = args.pos;
         return macro {
             if (${args}.length < $v{requiredArgs}) {
-                throw new haxe.Exception("Not enough unpacking arguments");
+                throw new bglib.macros.UnpackingException(
+                    "Not enough unpacking arguments"
+                );
             }
             $expr;
         };
@@ -78,6 +80,7 @@ class UnPack {
      * @param fn to call.
      * @param args to unpack.
      * @return unpacked function call.
+     * @throws UnpackingException if the arguments are not valid.
     **/
     macro static public function unpack(fn:Expr, args:Expr):Expr {
         var exp = switch (Context.typeof(args)) {
