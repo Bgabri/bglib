@@ -14,7 +14,7 @@ class BaseCommand {
     /**
      * Creates the default fields for the cli commands.
      * @param command the default command function name to call.
-     * @return Array<Field>
+     * @return Array<Field> the class fields
     **/
     static function getBaseCmdFields(command:String):Array<Field> {
         var c = macro class BaseCommand {
@@ -47,13 +47,18 @@ class BaseCommand {
                 }
             }
         }
+
         return c.fields;
     }
 
+    /**
+     * Creates the main entry point for the cli command.
+     * @return Field main class field
+    **/
     static function getMainField() {
         var cm = macro class CmdMain {
             public static function main() {
-                try {
+                try { // TODO: find a way to not need create()
                     tink.Cli.process(Sys.args(), create()).handle(Exit.handler);
                 } catch (e:bglib.cli.exceptions.MalformedRequest) {
                     Sys.println(e.message);
@@ -90,7 +95,6 @@ class BaseCommand {
             fields.push(f);
         }
         if (useMain && !fields.exists((f) -> f.name == "main")) {
-            trace("A");
             fields.push(getMainField());
         }
         return fields;
