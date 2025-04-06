@@ -20,7 +20,14 @@ class Unpacking {
         return result;
     }
 
+    static function oFunc(?a:Int, b:Int, c:Int, ?d:Int, e:Int, ?f:Int, ?g:Int) {
+        trace(a, b, c, d, e, f, g);
+    }
+
     static function main() {
+        oFunc.unpack([0, 1, 2]);
+        oFunc.unpack([0, 1, 2, 3]);
+        oFunc.unpack([0, 1, 2, 3, 4]);
         var as:Array<Int> = [2, 5, 7];
         trace(multiply.unpack(as));
         var as:haxe.ds.Vector<Int> = new haxe.ds.Vector(2, 2);

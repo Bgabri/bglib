@@ -24,6 +24,36 @@ class UnPack {
         }
     }
 
+    static function injectMap(
+        requiredRight:Array<Int>, requiredArgs:Int, expr:Expr, args:Expr
+    ):Expr {
+        // create the argument map based on the number of arguments
+        // always matches all of the required args whilst preserving the
+        // args call order.
+        var finalExpr = macro {
+            var __unpacked_map__ = $v{requiredRight};
+            var __unpacked_pos__ = 0;
+            var __unpacked_args__ = ${args}.length;
+            var __unpacked_non_pos__ = ${args}.length;
+            for (i in 0...__unpacked_map__.length) {
+                var r = __unpacked_map__[i];
+                if (r < __unpacked_args__) {
+                    __unpacked_map__[i] = __unpacked_pos__++;
+                    __unpacked_args__--;
+                } else {
+                    __unpacked_map__[i] = __unpacked_non_pos__++;
+                }
+            }
+            if (${args}.length < $v{requiredArgs}) {
+                throw new bglib.macros.UnpackingException(
+                    "Not enough unpacking arguments"
+                );
+            }
+            $expr;
+        };
+        return finalExpr;
+    }
+
     static function arrUnpack(fn:Expr, args:Expr):Expr {
         var expr = macro fn();
         var fnArgs = [];
@@ -35,28 +65,32 @@ class UnPack {
                 Context.error("Expected a function", fn.pos);
         }
 
+        if (fnArgs.exists((arg) -> getType(arg.t) == "haxe.Rest")) {
+            Context.error("Cannot unpack variable arguments", fn.pos);
+        }
+
         var requiredArgs = 0;
+        fnArgs.reverse();
+        // rolling sum of required arguments.
+        var requiredRight = fnArgs.map((arg) -> {
+            if (!arg.opt) {
+                requiredArgs++;
+                return 0;
+            } else return requiredArgs;
+        });
+        fnArgs.reverse();
+
         var eArgs:Array<Expr> = [];
         for (i in 0...fnArgs.length) {
             var arg = fnArgs[i];
-            if (getType(arg.t) == "haxe.Rest") {
-                Context.error("Cannot unpack variable arguments", fn.pos);
-            }
-            if (!arg.opt) requiredArgs++;
-            eArgs.push(macro ${args}[$v{i}]);
+
+            eArgs.push(macro ${args}[__unpacked_map__[$v{i}]]);
         }
 
         expr.expr = ECall(fn, eArgs);
-        var finalExpr = macro {
-            if (${args}.length < $v{requiredArgs}) {
-                throw new bglib.macros.UnpackingException(
-                    "Not enough unpacking arguments"
-                );
-            }
-            $expr;
-        };
+        var finalExpr = injectMap(requiredRight, requiredArgs, expr, args);
+        finalExpr = rePos(args.pos, finalExpr);
 
-        finalExpr = finalExpr.map(rePos.bind(args.pos));
         return finalExpr;
     }
 
@@ -88,6 +122,7 @@ class UnPack {
 
     /**
      * Unpacks an array of arguments into a function call.
+     * 
      * @param fn to call.
      * @param args to unpack.
      * @return unpacked function call.
@@ -105,7 +140,7 @@ class UnPack {
         }
         #if (debug >= "2")
         @SuppressWarning("checkstyle:Trace")
-        trace(exp.toString());
+        Sys.println(exp.toString());
         #end
         return exp;
     }
