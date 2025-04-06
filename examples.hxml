@@ -1,5 +1,4 @@
 -cp examples
 -lib tink_cli
 -lib bglib
---debug
 -w -WDeprecated

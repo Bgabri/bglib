@@ -18,13 +18,16 @@ class Grain {
      * @param maxDepth max depth to print
      * @param depth current depth
      **/
-    public static function ePrint(e:Expr, maxDepth = -1, depth:Int = 0) {
+    public static function exprTree(e:Expr, maxDepth = -1, depth:Int = 0) {
+        if (e == null) return;
+        if (e.expr == null) return;
         if (depth > maxDepth && maxDepth != -1) return;
 
         var str = StringTools.lpad("", " ", depth);
         if (depth == 0) str = "";
+    
         Sys.println('$str${e.expr.getName()}, ${e.pos}');
 
-        e.iter(ePrint.bind(_, maxDepth, ++depth));
+        e.iter(exprTree.bind(_, maxDepth, ++depth));
     }
 }
