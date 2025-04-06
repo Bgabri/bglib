@@ -29,7 +29,8 @@ class TestCli {
     @:command
     public var sub:Sub = new Sub();
 
-    function cmd() {
+    function cmd(?a:Int, b:Int) {
+        trace(a, b);
         throw "hi";
         Sys.println("cmd");
     }

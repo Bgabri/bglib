@@ -42,11 +42,13 @@ class UnPack {
                     __unpacked_args__--;
                 } else {
                     __unpacked_map__[i] = __unpacked_non_pos__++;
+                    // __unpacked_map__[i] = -1;
                 }
             }
             if (${args}.length < $v{requiredArgs}) {
                 throw new bglib.macros.UnpackingException(
-                    "Not enough unpacking arguments"
+                    ${args}.length,
+                    $v{requiredArgs}
                 );
             }
             $expr;
@@ -78,6 +80,7 @@ class UnPack {
                 return 0;
             } else return requiredArgs;
         });
+        requiredRight.reverse();
         fnArgs.reverse();
 
         var eArgs:Array<Expr> = [];

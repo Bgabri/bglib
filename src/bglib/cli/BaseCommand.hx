@@ -52,7 +52,8 @@ class BaseCommand {
                     bglib.macros.UnPack.unpack($i{command}, rest);
                 } catch (e:bglib.macros.UnpackingException) {
                     throw new bglib.cli.exceptions.MalformedRequest(
-                        "Malformed input: not enough arguments"
+                        "Malformed input: Insufficient arguments." +
+                        ' Expected: ${e.requiredArgs} or more, Got: ${e.args}'
                     );
                 }
             }

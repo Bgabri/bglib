@@ -7,8 +7,8 @@ class Unpacking {
         return a * b;
     }
 
-    static function multiply3(a:Int, ?b:Int, c:Int = 10):Int {
-        if (b == null) b = 4;
+    static function multiply3(?a:Int, b:Int, c:Int = 10):Int {
+        if (a == null) a = 4;
         return a * b * c;
     }
 
@@ -24,7 +24,14 @@ class Unpacking {
         trace(a, b, c, d, e, f, g);
     }
 
+    static function oFunc2(?a:Int, b:Int) {
+        trace(a, b);
+    }
+
     static function main() {
+        oFunc2.unpack([0]);
+        oFunc2.unpack([0, 1]);
+
         oFunc.unpack([0, 1, 2]);
         oFunc.unpack([0, 1, 2, 3]);
         oFunc.unpack([0, 1, 2, 3, 4]);
