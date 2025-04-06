@@ -5,6 +5,7 @@ import bglib.cli.Exit;
  * Usage: cli <command> [flags]
 **/
 @:build(bglib.cli.BaseCommand.build(true))
+@:build(bglib.macros.ExceptionHandler.handle())
 class TestCli {
     /**
      * wow field doc
@@ -29,6 +30,7 @@ class TestCli {
     public var sub:Sub = new Sub();
 
     function cmd() {
+        throw "hi";
         Sys.println("cmd");
     }
 

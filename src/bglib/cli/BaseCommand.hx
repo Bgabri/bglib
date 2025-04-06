@@ -53,24 +53,31 @@ class BaseCommand {
 
     /**
      * Creates the main entry point for the cli command.
-     * @return Field main class field
+     * @return Array<Field> the class fields
     **/
-    static function getMainField() {
-        var cm = macro class CmdMain {
+    static function getMainFields():Array<Field> {
+        var cm = macro class BaseCommandMain {
+            @:handleException
+            static function handleMalformedRequest(
+                e:bglib.cli.exceptions.MalformedRequest
+            ) {
+                Sys.println(e.message);
+                Sys.println("Use --help for usage");
+                Sys.exit(1);
+            }
+
+            @:handleException
+            static function handleException(e:haxe.Exception) {
+                Sys.println("Internal error: " + e.message);
+                Sys.exit(1);
+            }
+
             public static function main() {
-                try { // TODO: find a way to not need create()
-                    tink.Cli.process(Sys.args(), create()).handle(Exit.handler);
-                } catch (e:bglib.cli.exceptions.MalformedRequest) {
-                    Sys.println(e.message);
-                    Sys.println("Use --help for usage");
-                    Sys.exit(1);
-                } catch (e:haxe.Exception) {
-                    Sys.println("Inernal error: " + e.message);
-                    Sys.exit(1);
-                }
+                // TODO: is create the best option?
+                tink.Cli.process(Sys.args(), create()).handle(Exit.handler);
             }
         }
-        return cm.fields[0];
+        return cm.fields;
     }
     #end
 
@@ -94,8 +101,12 @@ class BaseCommand {
             if (fields.exists((cf) -> cf.name == f.name)) continue;
             fields.push(f);
         }
-        if (useMain && !fields.exists((f) -> f.name == "main")) {
-            fields.push(getMainField());
+        if (useMain) {
+            var mainFields = getMainFields();
+            for (f in mainFields) {
+                if (fields.exists((cf) -> cf.name == f.name)) continue;
+                fields.push(f);
+            }
         }
         return fields;
     }
