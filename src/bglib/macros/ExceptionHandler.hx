@@ -13,8 +13,14 @@ using haxe.EnumTools;
 
 using bglib.macros.Grain;
 
+/**
+ * Global exception handler.
+ * Wraps the specified function with a try-catch blocks.
+ * Use @:handleException on a function to catch the 
+ * specified exceptions.
+ **/
 class ExceptionHandler {
-    static final metaDataName:String = "handleException";
+    static final metaDataName:String = ":handleException";
 
     #if macro
     static function extractCatch(field:Field):Catch {
@@ -45,41 +51,43 @@ class ExceptionHandler {
         return c;
     }
 
-    static function injectTryCatch(main:Field, catches:Array<Catch>):Expr {
-        // create try-catch expression and warp it around the main function
-        var mainFunc;
-        switch main.kind {
+    static function injectTryCatch(field:Field, catches:Array<Catch>):Expr {
+        // create try-catch expression and warp it around field
+        var fieldFunc;
+        switch field.kind {
             case FFun(f):
-                mainFunc = f;
+                fieldFunc = f;
             default:
-                Context.error("main is not a function", main.pos);
+                Context.error('\'${field.name}\' is not a function', field.pos);
         }
 
-        var mainTryCatch:Expr = {
-            pos: mainFunc.expr.pos,
-            expr: ETry(mainFunc.expr, catches),
+        var fieldTryCatch:Expr = {
+            pos: fieldFunc.expr.pos,
+            expr: ETry(fieldFunc.expr, catches),
         }
 
-        mainFunc.expr = mainTryCatch;
+        fieldFunc.expr = fieldTryCatch;
         #if (debug >= 3)
-        Grain.exprTree(mainTryCatch);
+        Grain.exprTree(fieldTryCatch);
         #elseif (debug >= 2)
-        Sys.println(mainTryCatch.toString());
+        Sys.println(fieldTryCatch.toString());
         #end
-        return mainTryCatch;
+        return fieldTryCatch;
     }
     #end
 
     /**
      * Global Exception handler
+     * @param name of the function to wrap around
      * @return Array<Field>
     **/
-    macro public static function handle():Array<Field> {
+    macro public static function handle(?name:String = "main"):Array<Field> {
         var fields = Context.getBuildFields();
-        var main:Field = fields.find((f) -> f.name == "main");
+        var field:Field = fields.find((f) -> f.name == name);
 
-        if (main == null) {
-            Context.error("No main function found", Context.currentPos());
+        if (field == null) {
+            Context.error(
+                'No function \'$name\' found', Context.currentPos());
         }
 
         var catches:Array<Catch> = [];
@@ -90,7 +98,7 @@ class ExceptionHandler {
         }
 
         // TODO: topo-sort catches for arbitrary ordering
-        injectTryCatch(main, catches);
+        injectTryCatch(field, catches);
         return fields;
     }
 }
