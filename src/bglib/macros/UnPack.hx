@@ -6,7 +6,7 @@ import haxe.macro.Expr;
 using Lambda;
 using StringTools;
 
-using haxe.macro.ExprTools;
+using haxe.macro.Tools;
 
 /**
  * Macro which unpacks an array or struct of arguments into a function call.
@@ -47,8 +47,7 @@ class UnPack {
         }
 
         expr.expr = ECall(fn, eArgs);
-        var pos = args.pos;
-        return macro {
+        var finalExpr = macro {
             if (${args}.length < $v{requiredArgs}) {
                 throw new bglib.macros.UnpackingException(
                     "Not enough unpacking arguments"
@@ -56,21 +55,33 @@ class UnPack {
             }
             $expr;
         };
+
+        finalExpr = finalExpr.map(rePos.bind(args.pos));
+        return finalExpr;
+    }
+
+    static function rePos(pos:Position, e:Expr):Expr {
+        return switch (e.expr) {
+            case EThrow(e):
+                {expr: EThrow(e), pos: pos};
+            default:
+                e.map(rePos.bind(pos));
+        }
     }
 
     static function structUnpack(fn:Expr, st:Expr):Expr {
         var expr = macro fn();
-        var eargs:Array<Expr> = [];
+        var eArgs:Array<Expr> = [];
         switch (Context.typeof(fn)) {
             case TFun(fargs, ret):
                 for (i in 0...fargs.length) {
                     var s = fargs[i].name;
-                    eargs.push(macro $st.$s);
+                    eArgs.push(macro $st.$s);
                 }
             default:
                 Context.error("Expected a function", fn.pos);
         }
-        expr.expr = ECall(fn, eargs);
+        expr.expr = ECall(fn, eArgs);
         return expr;
     }
     #end
