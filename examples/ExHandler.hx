@@ -16,12 +16,15 @@ class ExHandler {
     @handleException
     static function test(e:Exception) {
         trace("Hello from test");
-        // throw e;
+        reThrow(e);
     }
 
+    static function reThrow(e:Exception) {
+        throw e;
+    }
 
     public static function main() {
-        throw new DummyException("Dummy exception");
-        // create();
+        // throw new DummyException("Dummy exception");
+        throw "Hello from main";
     }
 }

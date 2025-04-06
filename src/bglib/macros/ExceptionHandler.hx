@@ -11,14 +11,12 @@ using StringTools;
 using haxe.macro.Tools;
 using haxe.EnumTools;
 
+using bglib.macros.Grain;
+
 class ExceptionHandler {
     static final metaDataName:String = "handleException";
 
     #if macro
-    static function something(field:Field) {
-        trace(field);
-    }
-
     static function extractCatch(field:Field):Catch {
         var func:Function;
         switch field.kind {
@@ -32,21 +30,23 @@ class ExceptionHandler {
         }
 
         // make catch expression
-        var argName = func.args[0].name;
+        var arg = func.args[0];
         var catchExpr = macro {
-            $i{field.name}($i{argName});
+            $i{field.name}($i{arg.name});
         };
-        catchExpr.pos = func.expr.pos;
+        catchExpr = Grain.rePos(catchExpr, field.pos);
+
         var c:Catch = {
             expr: catchExpr,
-            name: argName,
-            type: func.args[0].type,
+            name: arg.name,
+            type: arg.type,
         };
 
         return c;
     }
 
-    static function buildTryCatch(main:Field, catches:Array<Catch>):Expr {
+    static function injectTryCatch(main:Field, catches:Array<Catch>):Expr {
+        // create try-catch expression and warp it around the main function
         var mainFunc;
         switch main.kind {
             case FFun(f):
@@ -59,15 +59,21 @@ class ExceptionHandler {
             pos: mainFunc.expr.pos,
             expr: ETry(mainFunc.expr, catches),
         }
-        #if (debug >= 2)
-        trace(mainTryCatch.toString());
-        #end
 
         mainFunc.expr = mainTryCatch;
+        #if (debug >= 3)
+        Grain.exprTree(mainTryCatch);
+        #elseif (debug >= 2)
+        Sys.println(mainTryCatch.toString());
+        #end
         return mainTryCatch;
     }
     #end
 
+    /**
+     * Global Exception handler
+     * @return Array<Field>
+    **/
     macro public static function handle():Array<Field> {
         var fields = Context.getBuildFields();
         var main:Field = fields.find((f) -> f.name == "main");
@@ -79,12 +85,12 @@ class ExceptionHandler {
         var catches:Array<Catch> = [];
         for (field in fields) {
             if (field.meta.exists((m) -> m.name == metaDataName)) {
-                var c = extractCatch(field);
-                catches.push(c);
+                catches.push(extractCatch(field));
             }
         }
-        // TODO: topo-sort catches for aribitrary order
-        var tryCatch = buildTryCatch(main, catches);
+
+        // TODO: topo-sort catches for arbitrary ordering
+        injectTryCatch(main, catches);
         return fields;
     }
 }
