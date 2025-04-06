@@ -255,7 +255,7 @@ class Doc implements DocFormatter<String> {
     function extractDoc(doc:String):DocString {
         if (doc == null) return null;
         doc = normalizeDoc(doc);
-        var multiLineDescriptor = "(.*?)\n?(?=@param|@return(s)?|$)";
+        var multiLineDescriptor = "(.*?)\n?(?=@param|@return(s)?|@throw(s)?|$)";
         var type = "\\w+(<[\\S ]*>)?";
 
         var paramReg = new EReg(

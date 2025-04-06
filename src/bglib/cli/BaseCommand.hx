@@ -7,7 +7,17 @@ using Lambda;
 
 /**
  * Convenience macro to build a cli command.
- * Defines a default help flag, multi argument and error handler.
+ * Defined variables:
+ *  var help:Bool;
+ * Defined functions:
+ *  function new();
+ *  public function printHelp();
+ *  public function run();
+ *  public static function main();
+ *  static function handleMalformedRequest();
+ *  static function handleException();
+ * 
+ * Implement a function to override it.
 **/
 class BaseCommand {
     #if macro
@@ -36,7 +46,7 @@ class BaseCommand {
              * @param rest cli args
             **/
             @:defaultCommand
-            public function run(rest:tink.cli.Rest<String>) {
+            public function run(rest:tink.cli.Rest<Dynamic>) {
                 if (help) printHelp();
                 try {
                     bglib.macros.UnPack.unpack($i{command}, rest);
@@ -74,7 +84,8 @@ class BaseCommand {
 
             public static function main() {
                 // TODO: is create the best option?
-                tink.Cli.process(Sys.args(), create()).handle(Exit.handler);
+                tink.Cli.process(Sys.args(), create())
+                    .handle(bglib.cli.Exit.handler);
             }
         }
         return cm.fields;

@@ -4,7 +4,7 @@ using Lambda;
 /**
  * An edge connecting two nodes.
  **/
-@:allow(Graph)
+@:allow(bglib.utils.Graph)
 @:structInit class Edge<N, E> {
     var n0:Node<N, E>;
     var n1:Node<N, E>;
@@ -25,7 +25,7 @@ using Lambda;
 /**
  * A node on the graph with data.
  **/
-@:allow(Graph)
+@:allow(bglib.utils.Graph)
 class Node<N, E> {
     var edges:Array<Edge<N, E>>;
     var data:N;
