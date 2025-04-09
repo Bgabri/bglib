@@ -73,13 +73,14 @@ class BaseCommand {
                 e:bglib.cli.exceptions.MalformedRequest
             ) {
                 Sys.println(e.message);
-                Sys.println("Use --help for usage");
+                Sys.println("Include the --help flag for usage");
                 Sys.exit(1);
             }
 
             @:handleException
             static function handleException(e:haxe.Exception) {
-                Sys.println("Internal error: " + e.message);
+                Sys.print("Internal error: " + e.message);
+                Sys.print(haxe.CallStack.toString(e.stack));
                 Sys.exit(1);
             }
 

@@ -132,10 +132,12 @@ class Doc implements DocFormatter<String> {
         out += formatCommand(spec.commands[0]);
 
         // format subcommands
-        out += commandsStr + "\n";
-        for (i in 1...spec.commands.length) {
-            var cmd = spec.commands[i];
-            out += indentLines(formatCommand(cmd));
+        if (spec.commands.length > 1) {
+            out += commandsStr + "\n";
+            for (i in 1...spec.commands.length) {
+                var cmd = spec.commands[i];
+                out += indentLines(formatCommand(cmd));
+            }
         }
 
         // format flags

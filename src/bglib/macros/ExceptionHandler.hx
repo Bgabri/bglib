@@ -82,6 +82,7 @@ class ExceptionHandler {
      * @return Array<Field>
     **/
     macro public static function handle(?name:String = "main"):Array<Field> {
+        // TODO: call handle from anywhere.
         var fields = Context.getBuildFields();
         var field:Field = fields.find((f) -> f.name == name);
 
