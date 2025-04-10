@@ -20,6 +20,14 @@ class FilePathImp extends Path {
     }
 
     /**
+     * Creates the directory at this path.
+     **/
+    public function createDirectory() {
+        if (exists()) throw "File already exists: " + this.toString();
+        FileSystem.createDirectory(this.toString());
+    }
+
+    /**
      * Checks if the file is a directory.
      * @return Bool
     **/
@@ -85,9 +93,8 @@ class FilePathImp extends Path {
             default: // Linux and others
                 // https://specifications.freedesktop.org/basedir-spec/latest/
                 var xdgVar = Sys.getEnv("XDG_CONFIG_HOME");
-                if (xdgVar != null) xdgVar; else
-                    Sys.getEnv("HOME") +
-                    "/.config";
+                if (xdgVar != null) xdgVar;
+                else Sys.getEnv("HOME") + "/.config";
         }
 
         configPath += "/" + name;
@@ -112,9 +119,8 @@ class FilePathImp extends Path {
             default: // Linux and others
                 // https://specifications.freedesktop.org/basedir-spec/latest/
                 var xdgVar = Sys.getEnv("XDG_DATA_HOME");
-                if (xdgVar != null) xdgVar; else
-                    Sys.getEnv("HOME") +
-                    "/.local/share";
+                if (xdgVar != null) xdgVar;
+                else Sys.getEnv("HOME") + "/.local/share";
         }
 
         dataPath += "/" + name;

@@ -37,8 +37,8 @@ class Utils {
     /**
      * Consistent type clamping.
      * @param x to clamp
-     * @param lower float or int
-     * @param higher float or int
+     * @param lower float or int (inclusive)
+     * @param higher float or int (inclusive)
      * @return T
      **/
     public static inline function clamp<T:Float>(x:T, lower:T, higher:T):T {
@@ -46,7 +46,7 @@ class Utils {
     }
 
     /**
-     * Consistent type clamping.
+     * Consistent type absolute.
      * @param a float or int
      * @return T
      **/

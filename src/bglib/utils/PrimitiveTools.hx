@@ -4,19 +4,19 @@ using Lambda;
 
 /**
  * Import lambda tools.
- **/
+**/
 @:dox(hide)
 typedef TLambda = Lambda;
 
 /**
  * Import string tools.
- **/
+**/
 @:dox(hide)
 typedef TString = StringTools;
 
 /**
  * Import date tools.
- **/
+**/
 @:dox(hide)
 typedef TDate = DateTools;
 
@@ -152,10 +152,10 @@ class PrimitiveTools {
 
         var digits = Math.floor(Utils.logb(10, length));
         for (i in 0...digits + 1) {
-            var v = [for (j in 0...length) (Math.floor(j / Math.pow(
-                10, digits -
-                i
-            )) % 10)];
+            var v = [
+                for (j in 0...length)
+                    (Math.floor(j / Math.pow(10, digits - i)) % 10)
+            ];
             // var l = v.map(n -> n == 0 ? " " : '$n');
             buffer.add(spacing);
             buffer.add("  │ \x1b[2m");
@@ -200,13 +200,46 @@ class PrimitiveTools {
         var t = stamp.getTime();
         var d = DateTools.parse(t);
 
-        var out = '${d.days} ';
-        out += (d.hours < 10 ? '0':'') + d.hours;
-        out += ":" + (d.seconds < 10 ? '0':'') + d.seconds;
+        var out = d.days == 0 ? '' : '${d.days}d ';
+        out += (d.hours < 10 ? '0' : '') + d.hours;
+        out += ":" + (d.minutes < 10 ? '0' : '') + d.minutes;
+        out += ":" + (d.seconds < 10 ? '0' : '') + d.seconds;
         if (ms) {
-            var m = Std.int(d.ms/10);
-            out += ":" + (m < 10 ? '0':'') + m;
+            var m = Std.int(d.ms / 10);
+            out += "." + (m < 10 ? '0' : '') + m;
         }
         return out;
+    }
+
+    /**
+     * Converts a string to its corresponding day number.
+     * @param day of the week
+     * @return Int
+    **/
+    public static function toWeekDay(day:String):Int {
+        @:privateAccess
+        var i = DateTools.DAY_SHORT_NAMES.findIndex((d) -> d == day);
+        if (i != -1) return i + 1;
+        @:privateAccess
+        var i = DateTools.DAY_NAMES.findIndex((d) -> d == day);
+        if (i != -1) return i + 1;
+
+        throw 'Invalid day name: $day';
+    }
+
+    /**
+     * Converts a string to its corresponding month number.
+     * @param month of the year
+     * @return Int
+    **/
+    public static function toYearMonth(month:String):Int {
+        @:privateAccess
+        var i = DateTools.MONTH_SHORT_NAMES.findIndex((d) -> d == month);
+        if (i != -1) return i + 1;
+        @:privateAccess
+        var i = DateTools.MONTH_NAMES.findIndex((d) -> d == month);
+        if (i != -1) return i + 1;
+
+        throw 'Invalid month name: $month';
     }
 }

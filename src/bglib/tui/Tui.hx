@@ -20,13 +20,14 @@ class Tui {
     function print() {
         for (line in screenBuffer) {
             Sys.println(line.toString());
+            Sys.print(Ansi.csi + "G");
         }
     }
 
     /**
      * Clears the current screen buffer from the screen.
      **/
-    function clearScreen() {
+    public function clearScreen() {
         for (l in currentBuffer) {
             Sys.print(Ansi.moveCursorY(-1));
             Sys.print(Ansi.clearLine);
