@@ -22,8 +22,8 @@ class TestCli {
 
     /**
      * sub field doc
-     * @param _1 something
-     * @param _2
+     * @param ?_1 something
+     * @param _2:Array<Int>
      * @param _3 asdf
     **/
     @:command

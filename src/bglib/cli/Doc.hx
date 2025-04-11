@@ -9,6 +9,7 @@ typedef DocStringParam = {
     doc:String,
     ?name:String,
     ?type:String,
+    ?optional:Bool,
 }
 
 typedef DocString = {
@@ -149,6 +150,16 @@ class Doc implements DocFormatter<String> {
         return out;
     }
 
+    function docParamMap(p:DocStringParam):String {
+        if (p.type != null && p.type.startsWith("Array<")) {
+            return "[" + p.name + "...]";
+        }
+        if (p.optional) {
+            return "[" + p.name + "]";
+        }
+        return "<" + p.name + ">";
+    }
+
     function formatCommand(cmd:DocCommand):String {
         var out = "";
 
@@ -161,7 +172,7 @@ class Doc implements DocFormatter<String> {
 
         // format parameters
         if (ds.params.length > 0) {
-            out += ds.params.map((p) -> ' <${p.name}>').join("");
+            out += " " + ds.params.map(docParamMap).join(" ");
         }
         out += "\n";
 
@@ -193,7 +204,7 @@ class Doc implements DocFormatter<String> {
 
         // format parameters
         if (ds.params.length == 1) {
-            out += ' <${ds.params[0].name}>';
+            out += " " + docParamMap(ds.params[0]);
         }
         out += "\n";
 
@@ -261,7 +272,7 @@ class Doc implements DocFormatter<String> {
         var type = "\\w+(<[\\S ]*>)?";
 
         var paramReg = new EReg(
-            '@param +(\\w+)(:($type))? *$multiLineDescriptor', "gis"
+            '@param +(\\?)?(\\w+)(:($type))? *$multiLineDescriptor', "gis"
         );
         var returnReg = new EReg(
             '@return(s)? +($type) *$multiLineDescriptor', "gis"
@@ -274,10 +285,16 @@ class Doc implements DocFormatter<String> {
             head = paramReg.matchedLeft();
             head = trim.replace(head, "");
             do {
-                var name = paramReg.matched(1);
-                var type = paramReg.matched(3);
-                var desc = paramReg.matched(5);
-                params.push({name: name, type: type, doc: desc});
+                var opt = paramReg.matched(1) == "?" ? true : false;
+                var name = paramReg.matched(2);
+                var type = paramReg.matched(4);
+                var desc = paramReg.matched(6);
+                params.push({
+                    name: name,
+                    type: type,
+                    doc: desc,
+                    optional: opt
+                });
             } while (paramReg.match(paramReg.matchedRight()));
         }
 

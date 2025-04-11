@@ -12,13 +12,13 @@ typedef TLambda = Lambda;
  * Import string tools.
 **/
 @:dox(hide)
-typedef TString = StringTools;
+typedef TStringTools = StringTools;
 
 /**
  * Import date tools.
 **/
 @:dox(hide)
-typedef TDate = DateTools;
+typedef TDateTools = DateTools;
 
 /**
  * A utility class which defines useful functions on primitives.
@@ -188,6 +188,39 @@ class PrimitiveTools {
         }
 
         Sys.print(buffer.toString());
+    }
+
+    public static function tabular<T>(
+        arr:Array<Array<T>>, ?map: (T) -> String, delim = " ", ?length:(v:T) -> Int
+    ):String {
+        if (map == null) {
+            map = (v) -> {Std.string(v);};
+        }
+        if (length == null) {
+            length = (v) -> {map(v).length;};
+        }
+
+        var ms:Array<Int> = [];
+        for (vs in arr) {
+            for (i => v in vs) {
+                if (ms[i] == null) ms[i] = length(v);
+                ms[i] = Utils.max(ms[i], length(v));
+            }
+        }
+        var s = new StringBuf();
+        for (vs in arr) {
+            for (i => v in vs) {
+                var l = length(v);
+                var m = ms[i];
+                s.add(PrimitiveTools.repeat(" ", m - l));
+                s.add(map(v));
+                if (i != vs.length - 1) {
+                    s.add(delim);
+                }
+            }
+            s.add("\n");
+        }
+        return s.toString();
     }
 
     /**

@@ -2,11 +2,11 @@ package bglib.tui;
 
 /**
  * A helper class to facilitate clearing and drawing a Trees buffer.
- **/
+**/
 class Tui {
-
     var screenBuffer:Array<Trees>;
     var currentBuffer:Array<Trees>;
+
     public static var instance(get, default):Tui;
 
     function new() {
@@ -16,18 +16,24 @@ class Tui {
 
     /**
      * Prints the current screen buffer to the screen.
-     **/
+    **/
     function print() {
+        var buffer = new StringBuf();
         for (line in screenBuffer) {
-            Sys.println(line.toString());
-            Sys.print(Ansi.csi + "G");
+            buffer.add(line.toString() + "\n");
+            buffer.add(Ansi.csi + "G");
         }
+        Sys.print(buffer.toString());
     }
 
     /**
      * Clears the current screen buffer from the screen.
-     **/
-    public function clearScreen() {
+    **/
+    public function clearScreen(fullClear:Bool = false) {
+        if (fullClear) {
+            Sys.print(Ansi.clear);
+            return;
+        }
         for (l in currentBuffer) {
             Sys.print(Ansi.moveCursorY(-1));
             Sys.print(Ansi.clearLine);
@@ -36,9 +42,9 @@ class Tui {
 
     /**
      * Clears and draws the screen buffer.
-     **/
-    function refresh() {
-        clearScreen();
+    **/
+    function refresh(fullClear:Bool = false) {
+        clearScreen(fullClear);
         currentBuffer = screenBuffer;
         print();
     }
@@ -46,21 +52,24 @@ class Tui {
     /**
      * Redraws the given buffer to the screen.
      * @param buffer to draw
-     **/
-    public function redraw(buffer:Array<Trees>) {
+     * @param fullClear clears the entire screen before drawing
+    **/
+    public function redraw(buffer:Array<Trees>, fullClear:Bool = false) {
         screenBuffer = buffer;
-        refresh();
+        refresh(fullClear);
     }
 
     public function insert(x:Int, y:Int, c:String) {}
+
     public function replace(x:Int, y:Int, c:String) {}
+
     public function delete(x:Int, y:Int, l:Int) {}
 
     /**
      * Reads a string from stdin until the given character.
      * @param endChar 
      * @return String
-     **/
+    **/
     function readString(endChar:Int):String {
         var s = "";
         var char = Sys.getChar(false);
@@ -71,7 +80,7 @@ class Tui {
         return s;
     }
 
-    public function screenSize():{x:Int, y:Int} {
+    public function screenSize():{w:Int, h:Int} {
         Sys.print(Ansi.hideCursor);
 
         Sys.print(Ansi.moveCursorX(2048));
@@ -80,7 +89,7 @@ class Tui {
 
         Sys.print(Ansi.showCursor);
 
-        return p;
+        return {w: p.x, h: p.y};
     }
 
     public function cursorPosition():{x:Int, y:Int} {
