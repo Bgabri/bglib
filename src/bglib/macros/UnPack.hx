@@ -2,6 +2,7 @@ package bglib.macros;
 
 import haxe.macro.Context;
 import haxe.macro.Expr;
+import haxe.Constraints.Function;
 
 using Lambda;
 using StringTools;
@@ -88,6 +89,7 @@ class UnPack {
             var arg = fnArgs[i];
 
             // TODO: cast to the correct type.
+            // Unify?
             eArgs.push(macro ${args}[__unpacked_map__[$v{i}]]);
         }
 
@@ -132,7 +134,7 @@ class UnPack {
      * @return unpacked function call.
      * @throws UnpackingException if the arguments are not valid.
     **/
-    macro static public function unpack(fn:Expr, args:Expr):Expr {
+    macro static public function unpack(fn:ExprOf<Function>, args:Expr):Expr {
         var exp = switch (Context.typeof(args)) {
             case TInst(_.get().name => "Array", params) |
                 TAbstract(_.get().name => "Vector" | "Rest", params):

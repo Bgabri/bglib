@@ -1,12 +1,13 @@
+import bglib.ExceptionHandler;
 import bglib.cli.Exit;
+import bglib.cli.BaseCommand;
 
 /**
  * TestCli
  * Usage: cli <command> [flags]
 **/
-@:build(bglib.cli.BaseCommand.build(true))
-@:build(bglib.macros.ExceptionHandler.handle())
-class TestCli {
+@:baseCommand(true)
+class TestCli implements ExceptionHandler implements BaseCommand {
     /**
      * wow field doc
      * @param signal signal to send
@@ -33,10 +34,6 @@ class TestCli {
         trace(a, b);
         throw "hi";
         Sys.println("cmd");
-    }
-
-    static function create() {
-        return new TestCli();
     }
 }
 

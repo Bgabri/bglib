@@ -1,25 +1,41 @@
 package bglib.cli;
 
+import haxe.macro.ExprTools;
+import haxe.macro.Compiler;
 import haxe.macro.Context;
+import haxe.macro.Type;
+import haxe.macro.Expr;
 import haxe.macro.Expr.Field;
 
 using Lambda;
 
-/**
- * Convenience macro to build a cli command.
- * Defined variables:
- *  var help:Bool;
- * Defined functions:
- *  function new();
- *  public function printHelp();
- *  public function run();
- *  public static function main();
- *  static function handleMalformedRequest();
- *  static function handleException();
- * 
- * Implement a function to override it.
-**/
-class BaseCommand {
+using bglib.utils.PrimitiveTools;
+using bglib.macros.Grain;
+
+using haxe.macro.Tools;
+
+private typedef BaseCommandParam = {
+    ?useMain:Bool,
+    ?command:String
+};
+
+class BaseCommandMacro {
+    static final metadata:String = ":baseCommand";
+    static final metaParams:Array<MetaParam> = [
+        {
+            name: "useMain",
+            type: "Bool",
+            pattern: "EConst(CIdent(true|false))",
+            optional: true
+        },
+        {
+            name: "command",
+            type: "String",
+            pattern: "EConst(CString(_))",
+            optional: true
+        }
+    ];
+
     #if macro
     /**
      * Creates the default fields for the cli commands.
@@ -64,9 +80,10 @@ class BaseCommand {
 
     /**
      * Creates the main entry point for the cli command.
+     * @param classPath the class path
      * @return Array<Field> the class fields
     **/
-    static function getMainFields():Array<Field> {
+    static function getMainFields(classPath:TypePath):Array<Field> {
         var cm = macro class BaseCommandMain {
             @:handleException
             static function handleMalformedRequest(
@@ -86,11 +103,32 @@ class BaseCommand {
 
             public static function main() {
                 // TODO: is create the best option?
-                tink.Cli.process(Sys.args(), create())
+                tink.Cli.process(Sys.args(), new $classPath())
                     .handle(bglib.cli.Exit.handler);
             }
         }
         return cm.fields;
+    }
+
+    static function buildFields(useMain:Bool = false, command:String = "cmd") {
+        var fields = Context.getBuildFields();
+        var localType = Context.getLocalClass().get();
+
+        var cmdFields = getBaseCmdFields(command);
+
+        for (f in cmdFields) {
+            if (fields.exists((cf) -> cf.name == f.name)) continue;
+            fields.push(f);
+        }
+
+        if (useMain) {
+            var mainFields = getMainFields(localType.toTypePath());
+            for (f in mainFields) {
+                if (fields.exists((cf) -> cf.name == f.name)) continue;
+                fields.push(f);
+            }
+        }
+        return fields;
     }
     #end
 
@@ -100,27 +138,40 @@ class BaseCommand {
      * @param command the default command function name to call.
      * @return Array<Field>
     **/
-    public static macro function build(
-        useMain:Bool = false, command:String = "cmd"
-    ):Array<Field> {
-        var fields = Context.getBuildFields();
-        var cName = Context.getLocalClass()
-            .get()
-            .name;
+    @:allow("bglib.cli.BaseCommand")
+    static macro function build():Array<Field> {
+        var localType = Context.getLocalClass().get();
 
-        var cmdFields = getBaseCmdFields(command);
+        Compiler.registerCustomMetadata({
+            metadata: metadata,
+            doc: "base command options",
+            params: metaParams.map((p) -> p.parseParam())
+        });
+        var entry:MetadataEntry = Grain.getLocalClassMetadata(metadata);
+        var ps:BaseCommandParam = {};
+        if (entry != null) {
+            ps = PrimitiveTools.dynamicMap(
+                entry.extractMetadata(metaParams), ExprTools.getValue
+            );
+        }
 
-        for (f in cmdFields) {
-            if (fields.exists((cf) -> cf.name == f.name)) continue;
-            fields.push(f);
-        }
-        if (useMain) {
-            var mainFields = getMainFields();
-            for (f in mainFields) {
-                if (fields.exists((cf) -> cf.name == f.name)) continue;
-                fields.push(f);
-            }
-        }
-        return fields;
+        return buildFields(ps.useMain, ps.command);
     }
 }
+
+/**
+ * Convenience macro to build a cli command.
+ * Defined variables:
+ *  var help:Bool;
+ * Defined functions:
+ *  function new();
+ *  public function printHelp();
+ *  public function run();
+ *  public static function main();
+ *  static function handleMalformedRequest();
+ *  static function handleException();
+ * 
+ * Implement a function to override it.
+**/
+@:autoBuild(bglib.cli.BaseCommandMacro.build())
+interface BaseCommand {}

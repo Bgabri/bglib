@@ -1,11 +1,9 @@
 import haxe.Exception;
+import bglib.ExceptionHandler;
 
 class DummyException extends Exception {}
 
-// @:build(bglib.macros.ExceptionHandler.handle("non-existent"))
-// @:build(bglib.macros.ExceptionHandler.handle("someProp"))
-@:build(bglib.macros.ExceptionHandler.handle())
-class ExHandler {
+class ExHandler implements ExceptionHandler {
     var someProp:String;
 
     @:handleException
@@ -28,7 +26,6 @@ class ExHandler {
     }
 
     public static function main() {
-        // throw new DummyException("Dummy exception");
         throw "Hello from main";
     }
 }

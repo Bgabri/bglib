@@ -1,4 +1,3 @@
-
 import bglib.oops.*;
 
 class NoOne implements Singleton {
@@ -6,6 +5,7 @@ class NoOne implements Singleton {
         trace("hello there");
     }
 }
+
 class Oops {
     static function main() {
         trace(NoOne.instance);

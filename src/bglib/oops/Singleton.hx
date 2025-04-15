@@ -7,6 +7,7 @@ import haxe.macro.Expr;
 using Lambda;
 using StringTools;
 
+using bglib.macros.Grain;
 using bglib.utils.PrimitiveTools;
 
 using haxe.macro.Tools;
@@ -23,12 +24,15 @@ class SingletonMacro {
     public static macro function build():Array<Field> {
         var fields = Context.getBuildFields();
         var classType = Context.getLocalClass().get();
-        var pathType:TypePath = {pack: classType.pack, name: classType.name};
+        var pathType:TypePath = classType.toTypePath();
 
-        var complexType = null;
-        Context.onAfterInitMacros(() -> {
-            complexType = Context.getType(classType.name).toComplexType();
-        });
+        if (classType.params.length > 0) {
+            Context.error(
+                "Singletons cannot have type parameters", classType.pos
+            );
+        }
+
+        var complexType = Grain.safeGetType(classType.name).toComplexType();
 
         var st = macro class Singleton {
             public static var instance(get, null):$complexType;

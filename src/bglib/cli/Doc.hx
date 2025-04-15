@@ -1,5 +1,7 @@
 package bglib.cli;
 
+import haxe.ds.ArraySort;
+
 import tink.cli.DocFormatter;
 
 using Lambda;
@@ -129,7 +131,9 @@ class Doc implements DocFormatter<String> {
         if (spec.doc != null) out += normalizeDoc(spec.doc) + "\n";
 
         // format default command
-        spec.commands.sort((a, b) -> a.isDefault ? -1 : b.isDefault ? 1 : 0);
+        ArraySort.sort(
+            spec.commands, (a, b) -> a.isDefault ? -1 : b.isDefault ? 1 : 0
+        );
         out += formatCommand(spec.commands[0]);
 
         // format subcommands

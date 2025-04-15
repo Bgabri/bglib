@@ -1,6 +1,9 @@
 package bglib.utils;
 
+import haxe.Exception;
+
 using Lambda;
+using StringTools;
 
 /**
  * Import lambda tools.
@@ -44,7 +47,7 @@ class PrimitiveTools {
      * @param c to insert
      * @return String
     **/
-    public static inline function insert(
+    public static inline function insertChar(
         str:String, index:Int, c:String
     ):String {
         return str.substring(0, index) + c + str.substring(index);
@@ -57,7 +60,7 @@ class PrimitiveTools {
      * @param c to replace
      * @return String
     **/
-    public static inline function replace(
+    public static inline function replaceChar(
         str:String, index:Int, c:String
     ):String {
         return str.substring(0, index) + c + str.substring(index + c.length);
@@ -70,7 +73,7 @@ class PrimitiveTools {
      * @param c to remove
      * @return String
     **/
-    public static inline function remove(str:String, index:Int):String {
+    public static inline function removeChar(str:String, index:Int):String {
         return str.substring(0, index) + str.substring(index + 1);
     }
 
@@ -121,6 +124,23 @@ class PrimitiveTools {
     }
 
     /**
+     * Joins two arrays into an array of pairs.
+     * @param as the first array
+     * @param bs the second array
+     * @return Array<{a:T, b:U}>
+     **/
+    public static function zip<T, U>(
+        as:Array<T>, bs:Array<U>
+    ):Array<{a:T, b:U}> {
+        var n = Utils.min(as.length, bs.length);
+        var r = [];
+        for (i in 0...n) {
+            r.push({a: as[i], b: bs[i]});
+        }
+        return r;
+    }
+
+    /**
      * Shallow copy of a 2d array.
      * @param a the matrix
      * @return Array<Array<T>>
@@ -134,6 +154,23 @@ class PrimitiveTools {
             }
         }
         return n;
+    }
+
+    /**
+     * Maps the fields of the object to a new object.
+     * @warning use with care.
+     * @param a the object
+     * @param m the mapping function
+     * @return W
+     **/
+    @:noUsing
+    public static function dynamicMap<U, V>(a:Any, m:U->V):Any {
+        var d:Any = {};
+        for (s in Reflect.fields(a)) {
+            var f = Reflect.getProperty(a, s);
+            Reflect.setField(d, s, m(f));
+        }
+        return d;
     }
 
     /**
@@ -191,24 +228,30 @@ class PrimitiveTools {
     }
 
     public static function tabular<T>(
-        arr:Array<Array<T>>, ?map: (T) -> String, delim = " ", ?length:(v:T) -> Int
-    ):String {
+        arr:Array<Array<T>>, ?map:(T) -> String, delim = " ",
+        ?length:(v:T) -> Int
+    ):Array<String> {
         if (map == null) {
-            map = (v) -> {Std.string(v);};
+            map = (v) -> {
+                Std.string(v);
+            };
         }
         if (length == null) {
-            length = (v) -> {map(v).length;};
+            length = (v) -> {
+                map(v).length;
+            };
         }
 
-        var ms:Array<Int> = [];
+        var ms:Array<Null<Int>> = [];
         for (vs in arr) {
             for (i => v in vs) {
                 if (ms[i] == null) ms[i] = length(v);
                 ms[i] = Utils.max(ms[i], length(v));
             }
         }
-        var s = new StringBuf();
+        var ls:Array<String> = [];
         for (vs in arr) {
+            var s = new StringBuf();
             for (i => v in vs) {
                 var l = length(v);
                 var m = ms[i];
@@ -218,9 +261,9 @@ class PrimitiveTools {
                     s.add(delim);
                 }
             }
-            s.add("\n");
+            ls.push(s.toString());
         }
-        return s.toString();
+        return ls;
     }
 
     /**
@@ -249,6 +292,7 @@ class PrimitiveTools {
      * @param day of the week
      * @return Int
     **/
+    @:noUsing
     public static function toWeekDay(day:String):Int {
         @:privateAccess
         var i = DateTools.DAY_SHORT_NAMES.findIndex((d) -> d == day);
@@ -265,6 +309,7 @@ class PrimitiveTools {
      * @param month of the year
      * @return Int
     **/
+    @:noUsing
     public static function toYearMonth(month:String):Int {
         @:privateAccess
         var i = DateTools.MONTH_SHORT_NAMES.findIndex((d) -> d == month);
@@ -274,5 +319,85 @@ class PrimitiveTools {
         if (i != -1) return i + 1;
 
         throw 'Invalid month name: $month';
+    }
+
+    static function splitArgs(args:String, delim:Int = ",".code):Array<String> {
+        var result = [];
+        var depth = 0;
+        var current = "";
+        for (c in args) {
+            if (c == delim && depth == 0) {
+                result.push(current);
+                current = "";
+                continue;
+            }
+            switch (c) {
+                case "(".code:
+                    depth++;
+                case ")".code:
+                    depth--;
+                case _:
+            }
+            current += String.fromCharCode(c);
+        }
+        if (current != "") result.push(current);
+        if (depth != 0) {
+            throw new ParseException("Unmatched parentheses in : " + args);
+        }
+        return result;
+    }
+
+    /**
+     * Checks if the enum value matches the pattern. Use _ as wildcards.
+     * Supports basic type matching.
+     * 
+     * dynamicMatch(haxe.ds.Either.Left(182), "Left(182|23)|Right(_)")
+     * dynamicMatch(haxe.ds.Option.Some(451), "Left(451)")
+     * 
+     * @param e enum value to match
+     * @param pattern to match against
+     * @return Bool
+    **/
+    public static function dynamicMatch(e:EnumValue, pattern:String):Bool {
+        var ws = ~/\s+/g;
+        pattern = ws.replace(pattern, "");
+        if (pattern == "_") return true;
+        var patterns = splitArgs(pattern, "|".code);
+        if (patterns.length > 1) {
+            return patterns.exists((p) -> dynamicMatch(e, p));
+        }
+        switch (Type.typeof(e)) {
+            case TNull | TBool | TInt | TFloat:
+                return Std.string(e) == pattern;
+            case TClass(String):
+                return Std.string(e) == pattern;
+            case TEnum(_):
+            case t:
+                throw new ParseException(
+                    'Unsupported pattern: $pattern with type: $t '
+                );
+        }
+
+        var ematch = ~/(\w*)\((.*)\)/g;
+        if (!ematch.match(pattern)) throw new ParseException(
+            "Invalid pattern: " +
+            pattern
+        );
+
+        var id = ematch.matched(1);
+        var args = splitArgs(ematch.matched(2));
+        if (e.getName() != id) return false;
+
+        var eArgs = e.getParameters();
+        return all(zip(eArgs, args), (p) -> dynamicMatch(p.a, p.b));
+    }
+}
+
+/**
+ * Exception when parsing.
+**/
+class ParseException extends Exception {
+    public function new(message:String) {
+        super(message);
     }
 }
