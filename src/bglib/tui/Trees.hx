@@ -122,7 +122,10 @@ abstract Trees(TreEnum) from TreEnum to TreEnum {
         }
 
         var parsed = switch tre {
-            case TString(s): stack.join("") + s + Ansi.reset;
+            case TString(s):
+                if (stack.empty()) {
+                    s;
+                } else stack.join("") + s + Ansi.reset;
             case TConcat(t1, t2): parse(stack, t1) + parse(stack, t2);
             case TColour(c, t): parse(stack, t);
             case t: parse(stack, t.getParameters()[0]);
@@ -248,33 +251,4 @@ abstract Trees(TreEnum) from TreEnum to TreEnum {
     public static function fromString(str:String):Trees {
         return TString(str);
     }
-
-    #if debug
-    /**
-     * Test the Trees class.
-    **/
-    public static function test() {
-        var abs:Trees = " abs";
-        var enm:Trees = Bold(Italic(" enm"));
-        var str:String = " str";
-
-        @SuppressWarning("checkstyle:Trace")
-        trace(str + str, enm + str, abs + str);
-        @SuppressWarning("checkstyle:Trace")
-        trace(str + enm, enm + enm, abs + enm);
-        @SuppressWarning("checkstyle:Trace")
-        trace(str + abs, enm + abs, abs + abs);
-
-        var expr:Trees = Bold(Cross("Hello") + " World");
-
-        Assert.equals(expr.length, 11);
-        Assert.equals(
-            expr.toString(), "\x1b[1m\x1b[9mHello\x1b[0m\x1b[1m World\x1b[0m"
-        );
-        expr = Colour(Bright(Red), "enm");
-        Assert.equals(expr.toString(), "\x1b[91menm\x1b[0m");
-        expr = Colour(BackGround(Bright(Red)), "enm");
-        Assert.equals(expr.toString(), "\x1b[101menm\x1b[0m");
-    }
-    #end
 }

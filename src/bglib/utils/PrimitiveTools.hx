@@ -128,7 +128,7 @@ class PrimitiveTools {
      * @param as the first array
      * @param bs the second array
      * @return Array<{a:T, b:U}>
-     **/
+    **/
     public static function zip<T, U>(
         as:Array<T>, bs:Array<U>
     ):Array<{a:T, b:U}> {
@@ -162,7 +162,7 @@ class PrimitiveTools {
      * @param a the object
      * @param m the mapping function
      * @return W
-     **/
+    **/
     @:noUsing
     public static function dynamicMap<U, V>(a:Any, m:U->V):Any {
         var d:Any = {};

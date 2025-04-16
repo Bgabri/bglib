@@ -1,0 +1,7 @@
+-cp src
+-cp tests
+-lib tink_testrunner
+-lib tink_unittest
+-w -WDeprecated
+--main Run
+--interp

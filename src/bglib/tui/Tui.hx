@@ -1,13 +1,13 @@
 package bglib.tui;
 
+import bglib.oops.Singleton;
+
 /**
  * A helper class to facilitate clearing and drawing a Trees buffer.
 **/
-class Tui {
+class Tui implements Singleton{
     var screenBuffer:Array<Trees>;
     var currentBuffer:Array<Trees>;
-
-    public static var instance(get, default):Tui;
 
     function new() {
         screenBuffer = [];
@@ -28,6 +28,7 @@ class Tui {
 
     /**
      * Clears the current screen buffer from the screen.
+     * @param fullClear clears the entire screen
     **/
     public function clearScreen(fullClear:Bool = false) {
         if (fullClear) {
@@ -59,11 +60,9 @@ class Tui {
         refresh(fullClear);
     }
 
-    public function insert(x:Int, y:Int, c:String) {}
-
-    public function replace(x:Int, y:Int, c:String) {}
-
-    public function delete(x:Int, y:Int, l:Int) {}
+    // public function insert(x:Int, y:Int, c:String) {}
+    // public function replace(x:Int, y:Int, c:String) {}
+    // public function delete(x:Int, y:Int, l:Int) {}
 
     /**
      * Reads a string from stdin until the given character.
@@ -80,6 +79,10 @@ class Tui {
         return s;
     }
 
+    /**
+     * Returns the number of characters available in the current terminal.
+     * @return {w:Int, h:Int}
+     **/
     public function screenSize():{w:Int, h:Int} {
         Sys.print(Ansi.hideCursor);
 
@@ -92,6 +95,10 @@ class Tui {
         return {w: p.x, h: p.y};
     }
 
+    /**
+     * Returns the current cursor position in the terminal.
+     * @return {x:Int, y:Int}
+     **/
     public function cursorPosition():{x:Int, y:Int} {
         Sys.print(Ansi.csi + "6n");
         var char = Sys.getChar(false); // ESC
@@ -99,10 +106,5 @@ class Tui {
         var y:Int = Std.parseInt(readString(";".code));
         var x:Int = Std.parseInt(readString("R".code));
         return {x: x, y: y};
-    }
-
-    public static function get_instance():Tui {
-        if (instance == null) instance = new Tui();
-        return instance;
     }
 }

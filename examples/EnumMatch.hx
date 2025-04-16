@@ -26,12 +26,14 @@ class C {
     public function new() {}
 }
 
+typedef ETest = {
+    var e:EnumValue;
+    var pattern:String;
+}
+
 class EnumMatch<T> {
     public static function main() {
-        var tests:Array<{
-            var e:EnumValue;
-            var pattern:String;
-        }> = [
+        var tests:Array<ETest> = [
             {
                 e: B.singleS("a"),
                 pattern: "singleS(_)"
@@ -55,20 +57,20 @@ class EnumMatch<T> {
             {
                 e: B.singleI(42),
                 pattern: "singleI(4)|singleI(42)"
-            }, {
+            },
+            {
                 e: B.singleI(3),
                 pattern: "singleI(4)|singleI(95)|singleI(42)"
-            }, {
+            },
+            {
                 e: B.singleI(42),
                 pattern: "singleI(4|42)"
-            }, {
-                // e: B.doubleA(A.singleI(null), A.doubleS("a", "b")),
-                // e: B.doubleA(A.singleI(null), A.singleS("b")),
+            },
+            {
                 e: B.doubleA(A.singleI(null), A.singleS("c")),
                 pattern: "doubleA(_, doubleS(a, b)|singleS(a|b))"
             }
-
-            ];
+        ];
 
         for (t in tests) {
             var e = t.e;
