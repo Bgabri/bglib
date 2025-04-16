@@ -9,6 +9,7 @@ design
 dump
 result
 /shaders
+/ignore
 
 # files
 hlprofile.dump
