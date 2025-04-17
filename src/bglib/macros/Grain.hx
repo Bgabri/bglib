@@ -57,9 +57,10 @@ class Grain {
      * @return TypePath
     **/
     public static function toTypePath(bType:BaseType):TypePath {
+        var p = bType.module.split(".");
         return {
             pack: bType.pack,
-            name: bType.module,
+            name: p.pop(),
             sub: bType.name
         };
     }
@@ -82,12 +83,24 @@ class Grain {
      * Gets the metadata entry from the top of local class.
      * @param name of the metadata
      * @return MetadataEntry
-     **/
+    **/
     @:noUsing
     public static function getLocalClassMetadata(name:String):MetadataEntry {
         var localType = Context.getLocalClass().get();
         var classMetadata:Array<MetadataEntry> = localType.meta.get();
         return classMetadata.find((md) -> md.name == name);
+    }
+
+    static function setMetaExtractField(d:Any, f:MetaParam, p:Expr):Void {
+        if (f.extractValue != null && f.extractValue == true) {
+            try {
+                Reflect.setField(d, f.name, p.getValue());
+            } catch (e) {
+                Context.error("unable to extract value", p.pos);
+            }
+        } else {
+            Reflect.setField(d, f.name, p);
+        }
     }
 
     static function strictMetaExtract(
@@ -107,7 +120,7 @@ class Grain {
                     "Invalid param, expected: " + parseParam(f), p.pos
                 );
             }
-            Reflect.setField(d, f.name, p);
+            setMetaExtractField(d, f, p);
             matched[i] = true;
         }
         return d;
@@ -123,7 +136,7 @@ class Grain {
             for (j => f in defFields) {
                 if (matched[j]) continue;
                 if (!p.expr.dynamicMatch(f.pattern)) continue;
-                Reflect.setField(d, f.name, p);
+                setMetaExtractField(d, f, p);
                 matched[j] = true;
                 found = true;
                 break;
@@ -199,4 +212,5 @@ typedef MetaParam = {
     var type:String;
 
     var ?optional:Bool;
+    var ?extractValue:Bool;
 }

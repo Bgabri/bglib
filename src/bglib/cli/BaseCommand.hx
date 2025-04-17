@@ -26,13 +26,15 @@ class BaseCommandMacro {
             name: "useMain",
             type: "Bool",
             pattern: "EConst(CIdent(true|false))",
-            optional: true
+            optional: true,
+            extractValue: true
         },
         {
             name: "command",
             type: "String",
             pattern: "EConst(CString(_))",
-            optional: true
+            optional: true,
+            extractValue: true
         }
     ];
 
@@ -102,7 +104,6 @@ class BaseCommandMacro {
             }
 
             public static function main() {
-                // TODO: is create the best option?
                 tink.Cli.process(Sys.args(), new $classPath())
                     .handle(bglib.cli.Exit.handler);
             }
@@ -140,21 +141,14 @@ class BaseCommandMacro {
     **/
     @:allow("bglib.cli.BaseCommand")
     static macro function build():Array<Field> {
-        var localType = Context.getLocalClass().get();
-
         Compiler.registerCustomMetadata({
             metadata: metadata,
             doc: "base command options",
             params: metaParams.map((p) -> p.parseParam())
         });
         var entry:MetadataEntry = Grain.getLocalClassMetadata(metadata);
-        var ps:BaseCommandParam = {};
-        if (entry != null) {
-            ps = PrimitiveTools.dynamicMap(
-                entry.extractMetadata(metaParams), ExprTools.getValue
-            );
-        }
-
+        if (entry == null) return buildFields();
+        var ps:BaseCommandParam = entry.extractMetadata(metaParams);
         return buildFields(ps.useMain, ps.command);
     }
 }

@@ -1,9 +1,5 @@
 package bglib.tui;
 
-#if debug
-import bglib.utils.Assert;
-#end
-
 using bglib.utils.PrimitiveTools;
 
 /**

@@ -5,7 +5,7 @@ import bglib.oops.Singleton;
 /**
  * A helper class to facilitate clearing and drawing a Trees buffer.
 **/
-class Tui implements Singleton{
+class Tui implements Singleton {
     var screenBuffer:Array<Trees>;
     var currentBuffer:Array<Trees>;
 
@@ -35,10 +35,12 @@ class Tui implements Singleton{
             Sys.print(Ansi.clear);
             return;
         }
-        for (l in currentBuffer) {
-            Sys.print(Ansi.moveCursorY(-1));
-            Sys.print(Ansi.clearLine);
+        var buffer = new StringBuf();
+        for (line in currentBuffer) {
+            buffer.add(Ansi.moveCursorY(-1));
+            buffer.add(Ansi.clearLine);
         }
+        Sys.print(buffer.toString());
     }
 
     /**
@@ -82,7 +84,7 @@ class Tui implements Singleton{
     /**
      * Returns the number of characters available in the current terminal.
      * @return {w:Int, h:Int}
-     **/
+    **/
     public function screenSize():{w:Int, h:Int} {
         Sys.print(Ansi.hideCursor);
 
@@ -98,7 +100,7 @@ class Tui implements Singleton{
     /**
      * Returns the current cursor position in the terminal.
      * @return {x:Int, y:Int}
-     **/
+    **/
     public function cursorPosition():{x:Int, y:Int} {
         Sys.print(Ansi.csi + "6n");
         var char = Sys.getChar(false); // ESC

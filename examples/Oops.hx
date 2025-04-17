@@ -6,8 +6,9 @@ class NoOne implements Singleton {
     }
 }
 
-class Oops {
+class Oops implements Singleton {
     static function main() {
         trace(NoOne.instance);
+        trace(Oops.instance);
     }
 }
