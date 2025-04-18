@@ -1,5 +1,6 @@
 package bglib.utils;
 
+import haxe.ds.ArraySort;
 import haxe.Exception;
 
 using Lambda;
@@ -9,19 +10,19 @@ using StringTools;
  * Import lambda tools.
 **/
 @:dox(hide)
-typedef TLambda = Lambda;
+typedef _TLambda = Lambda;
 
 /**
  * Import string tools.
 **/
 @:dox(hide)
-typedef TStringTools = StringTools;
+typedef _TStringTools = StringTools;
 
 /**
  * Import date tools.
 **/
 @:dox(hide)
-typedef TDateTools = DateTools;
+typedef _TDateTools = DateTools;
 
 /**
  * A utility class which defines useful functions on primitives.
@@ -78,13 +79,30 @@ class PrimitiveTools {
     }
 
     /**
-     * Finds the maximum element in the array.
-     * @param arr to filter
+     * Finds the maximum element in the array, based on the 
+     * comparison function f.
+     * @param as to filter
+     * @param f (maxV, current)
      * @return T max
     **/
-    public static function max<T:Float>(arr:Array<T>):T {
-        var maxV:T = arr[0];
-        for (v in arr) {
+    public static function maxf<T>(as:Iterable<T>, f:(mv:T, c:T) -> Bool):T {
+        var maxV:T = null;
+        for (v in as) {
+            if (maxV == null) maxV = v;
+            if (f(maxV, v)) maxV = v;
+        }
+        return maxV;
+    }
+
+    /**
+     * Finds the maximum element in the array.
+     * @param as to filter
+     * @return T max
+    **/
+    public static function max<T:Float>(as:Iterable<T>):T {
+        var maxV:T = null;
+        for (v in as) {
+            if (maxV == null) maxV = v;
             if (maxV < v) maxV = v;
         }
         return maxV;
@@ -92,35 +110,79 @@ class PrimitiveTools {
 
     /**
      * Finds the minimum element in the array.
-     * @param arr to filter
+     * @param as to filter
      * @return T min
     **/
-    public static function min<T:Float>(arr:Array<T>):T {
-        var minV:T = arr[0];
-        for (v in arr) {
+    public static function min<T:Float>(as:Iterable<T>):T {
+        var minV:T = null;
+        for (v in as) {
+            if (minV == null) minV = v;
             if (minV > v) minV = v;
         }
         return minV;
     }
 
     /**
+     * Binary search over the array. The array must be sorted,
+     * if no value was found null is returned.
+     * @param as array
+     * @param f comparison function, where f(x) < 0 if x is under the goal
+     * f(x) == 0 if the goal is found and f(x) > 0 if x is over the goal.
+     * @return T
+    **/
+    public static function bsearch<T>(as:Array<T>, f:(mid:T) -> Float):T {
+        var low = 0;
+        var high = as.length - 1;
+        var result:T = null;
+
+        while (low <= high) {
+            var mid = (low + high) >> 1;
+            var cmp = f(as[mid]);
+            if (cmp == 0) {
+                result = as[mid];
+                high = mid - 1;
+            } else if (cmp < 0) low = mid + 1;
+            else high = mid - 1;
+        }
+        return result;
+    }
+
+    /**
+     * Sorts Array `a` according to the comparison function `cmp`, where
+     * `cmp(x,y)` returns 0 if `x == y`, a positive Int if `x > y` and a
+     * negative Int if `x < y`.
+     *
+     * This operation modifies Array `a` in place.
+     *
+     * This operation is stable: The order of equal elements is preserved.
+     *
+     * If `a` or `cmp` are null, the result is unspecified.
+     * 
+     * @param as the array to sort
+     * @param cmp the comparison function
+    **/
+    public static inline function stableSort<T>(as:Array<T>, cmp:T->T->Int) {
+        ArraySort.sort(as, cmp);
+    }
+
+    /**
      * Returns true only if any of the elements are true.
-     * @param arr to filter
+     * @param as to filter
      * @param f map
      * @return Bool
     **/
-    public static function any<T>(arr:Array<T>, f:T->Bool):Bool {
-        return arr.exists(f);
+    public static inline function any<T>(as:Iterable<T>, f:T->Bool):Bool {
+        return as.exists(f);
     }
 
     /**
      * Returns true only if all of the elements are true.
-     * @param arr to filter
+     * @param as to filter
      * @param f map
      * @return Bool
     **/
-    public static function all<T>(arr:Array<T>, f:T->Bool):Bool {
-        return arr.foreach(f);
+    public static inline function all<T>(as:Iterable<T>, f:T->Bool):Bool {
+        return as.foreach(f);
     }
 
     /**
@@ -142,15 +204,15 @@ class PrimitiveTools {
 
     /**
      * Shallow copy of a 2d array.
-     * @param a the matrix
+     * @param ass the matrix
      * @return Array<Array<T>>
     **/
-    public static function clone<T>(a:Array<Array<T>>):Array<Array<T>> {
+    public static function clone<T>(ass:Array<Array<T>>):Array<Array<T>> {
         var n:Array<Array<T>> = [];
-        for (y in 0...a.length) {
+        for (y in 0...ass.length) {
             n.push([]);
-            for (x in 0...a[y].length) {
-                n[y].push(a[y][x]);
+            for (x in 0...ass[y].length) {
+                n[y].push(ass[y][x]);
             }
         }
         return n;
@@ -176,16 +238,16 @@ class PrimitiveTools {
     /**
      * Prints out a matrix with a nice styling, 
      * works best with character matrix.
-     * @param arr to print
+     * @param ass to print
      * @param map elements
-     * @param delim = " " the spacing between elements
+     * @param delim the spacing between elements
     **/
     public static function prettyPrint<T, S>(
-        arr:Array<Array<T>>, ?map:T->S, delim = " "
+        ass:Array<Array<T>>, ?map:T->S, delim = " "
     ) {
         var buffer:StringBuf = new StringBuf();
-        var length = arr[0].length;
-        var spacing = repeat(" ", Math.floor(Utils.logb(10, arr.length)));
+        var length = ass[0].length;
+        var spacing = repeat(" ", Math.floor(Utils.logb(10, ass.length)));
 
         var digits = Math.floor(Utils.logb(10, length));
         for (i in 0...digits + 1) {
@@ -200,26 +262,26 @@ class PrimitiveTools {
             buffer.add("\x1b[0m\n");
         }
         var v = repeat("─", length * (1 + delim.length));
-        var spacing = repeat("─", Math.floor(Utils.logb(10, arr.length)));
+        var spacing = repeat("─", Math.floor(Utils.logb(10, ass.length)));
 
         buffer.add(spacing);
         buffer.add("──┼─");
         buffer.add(v);
         buffer.add("\n");
 
-        for (i in 0...arr.length) {
+        for (i in 0...ass.length) {
             var l:String;
             if (map != null) {
-                l = arr[i].map(map).join(delim);
+                l = ass[i].map(map).join(delim);
             } else {
-                l = arr[i].join(delim);
+                l = ass[i].join(delim);
             }
 
             var spacing = repeat(
                 " ",
-                Math.floor(Utils.logb(10, arr.length)) - Math.floor(Utils.logb(10, i)));
+                Math.floor(Utils.logb(10, ass.length)) - Math.floor(Utils.logb(10, i)));
             if (i == 0) spacing = repeat(
-                " ", Math.floor(Utils.logb(10, arr.length)));
+                " ", Math.floor(Utils.logb(10, ass.length)));
             buffer.add(spacing);
             buffer.add('\x1b[2m$i\x1b[0m │ $l\n');
         }
@@ -228,7 +290,7 @@ class PrimitiveTools {
     }
 
     public static function tabular<T>(
-        arr:Array<Array<T>>, ?map:(T) -> String, delim = " ",
+        ass:Array<Array<T>>, ?map:(T) -> String, delim = " ",
         ?length:(v:T) -> Int
     ):Array<String> {
         if (map == null) {
@@ -243,14 +305,14 @@ class PrimitiveTools {
         }
 
         var ms:Array<Null<Int>> = [];
-        for (vs in arr) {
+        for (vs in ass) {
             for (i => v in vs) {
                 if (ms[i] == null) ms[i] = length(v);
                 ms[i] = Utils.max(ms[i], length(v));
             }
         }
         var ls:Array<String> = [];
-        for (vs in arr) {
+        for (vs in ass) {
             var s = new StringBuf();
             for (i => v in vs) {
                 var l = length(v);

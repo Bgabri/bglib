@@ -1,16 +1,16 @@
 package bglib.oops;
 
-import haxe.macro.Context;
 import haxe.macro.Compiler;
+import haxe.macro.Context;
 import haxe.macro.Expr;
 
 using Lambda;
 using StringTools;
 
+using haxe.macro.Tools;
+
 using bglib.macros.Grain;
 using bglib.utils.PrimitiveTools;
-
-using haxe.macro.Tools;
 
 private typedef SingletonBuildParams = {
     var fieldName:String;

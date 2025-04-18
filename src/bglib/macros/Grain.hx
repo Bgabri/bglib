@@ -1,17 +1,17 @@
 package bglib.macros;
 
-import haxe.macro.Context;
+import haxe.ds.Vector;
 import haxe.macro.Compiler;
+import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Type;
-import haxe.ds.Vector;
 
 using Lambda;
 using StringTools;
 
-using bglib.utils.PrimitiveTools;
-
 using haxe.macro.Tools;
+
+using bglib.utils.PrimitiveTools;
 
 /**
  * Macro utils.

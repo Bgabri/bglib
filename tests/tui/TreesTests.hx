@@ -1,11 +1,11 @@
 package tui;
 
+import bglib.tui.Ansi;
+import bglib.tui.Trees.*;
+import bglib.tui.Trees;
+
 import tink.testrunner.Assertions;
 import tink.unit.Assert.assert;
-
-import bglib.tui.Trees;
-import bglib.tui.Trees.*;
-import bglib.tui.Ansi;
 
 @:asserts
 class TreesTests {

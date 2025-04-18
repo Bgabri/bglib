@@ -1,11 +1,9 @@
 package bglib.utils;
 
-import haxe.Exception;
+import haxe.io.Path;
 
 import sys.FileSystem;
 import sys.io.File;
-
-import haxe.io.Path;
 
 /**
  * The implementation of FilePath.

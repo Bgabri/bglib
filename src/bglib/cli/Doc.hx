@@ -21,10 +21,10 @@ typedef DocString = {
 }
 
 /**
- * TODO: make this a macro
  * Helper class for building Doc.
-**/
-class DocBuilder {
+ **/
+ class DocBuilder {
+    // TODO: make this a macro
     var doc:Doc;
 
     @:allow(bglib.cli.Doc)

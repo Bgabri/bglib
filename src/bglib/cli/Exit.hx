@@ -1,8 +1,8 @@
 package bglib.cli;
 
-import tink.core.Error;
 import tink.CoreApi.Noise;
 import tink.CoreApi.Outcome;
+import tink.core.Error;
 
 /**
  * Exit handler for CLI applications.

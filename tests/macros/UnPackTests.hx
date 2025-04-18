@@ -1,12 +1,13 @@
 package macros;
 
-import tink.testrunner.Assertions;
+import bglib.macros.UnpackingException;
+
 import tink.testrunner.Assertion;
+import tink.testrunner.Assertions;
 import tink.unit.Assert.assert;
 import tink.unit.AssertionBuffer;
 
 using bglib.macros.UnPack;
-using bglib.macros.UnpackingException;
 
 @:asserts
 class UnPackTests {
@@ -75,7 +76,6 @@ class UnPackTests {
         };
         return assert(multiply.unpack(as) == 15);
     }
-    
 
     public function vecUnpack():Assertions {
         var as:haxe.ds.Vector<Int> = new haxe.ds.Vector(2, 2);

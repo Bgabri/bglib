@@ -1,7 +1,7 @@
 package oops;
 
-import tink.unit.Assert.assert;
 import tink.testrunner.Assertions;
+import tink.unit.Assert.assert;
 
 class SingletonTests {
     public function new() {}

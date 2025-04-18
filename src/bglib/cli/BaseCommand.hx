@@ -1,18 +1,18 @@
 package bglib.cli;
 
-import haxe.macro.ExprTools;
 import haxe.macro.Compiler;
 import haxe.macro.Context;
-import haxe.macro.Type;
-import haxe.macro.Expr;
 import haxe.macro.Expr.Field;
+import haxe.macro.Expr;
+import haxe.macro.ExprTools;
+import haxe.macro.Type;
 
 using Lambda;
 
-using bglib.utils.PrimitiveTools;
-using bglib.macros.Grain;
-
 using haxe.macro.Tools;
+
+using bglib.macros.Grain;
+using bglib.utils.PrimitiveTools;
 
 private typedef BaseCommandParam = {
     ?useMain:Bool,

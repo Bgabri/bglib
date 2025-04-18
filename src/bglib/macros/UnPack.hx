@@ -1,8 +1,8 @@
 package bglib.macros;
 
+import haxe.Constraints.Function;
 import haxe.macro.Context;
 import haxe.macro.Expr;
-import haxe.Constraints.Function;
 
 using Lambda;
 using StringTools;
@@ -47,10 +47,7 @@ class UnPack {
                 }
             }
             if (${args}.length < $v{requiredArgs}) {
-                throw new bglib.macros.UnpackingException(
-                    ${args}.length,
-                    $v{requiredArgs}
-                );
+                throw new bglib.macros.UnpackingException(${args}.length, $v{requiredArgs});
             }
             $expr;
         };
@@ -134,7 +131,9 @@ class UnPack {
      * @return unpacked function call.
      * @throws UnpackingException if the arguments are not valid.
     **/
-    macro static public function unpack(fn:ExprOf<Function>, args:Expr):Expr {
+    public static macro function unpack(
+        fn:ExprOf<haxe.Constraints.Function>, args:Expr
+    ):Expr {
         var exp = switch (Context.typeof(args)) {
             case TInst(_.get().name => "Array", params) |
                 TAbstract(_.get().name => "Vector" | "Rest", params):

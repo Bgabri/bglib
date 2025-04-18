@@ -1,26 +1,12 @@
 package bglib.cli;
 
-import sys.thread.Mutex;
-
-import haxe.Timer;
-import haxe.MainLoop;
 import haxe.MainLoop.MainEvent;
+import haxe.MainLoop;
+import haxe.Timer;
 
-import sys.thread.Thread;
 import sys.thread.Deque;
-
-/**
- * Utility class for working with Deque.
-**/
-class DequeTools {
-    public static function empty<T>(q:Deque<T>, block:Bool, f:(v:T) -> Void) {
-        while (true) {
-            var v:T = q.pop(block);
-            if (v == null) break;
-            f(v);
-        }
-    }
-}
+import sys.thread.Mutex;
+import sys.thread.Thread;
 
 /**
  * Collects characters from stdin while 
