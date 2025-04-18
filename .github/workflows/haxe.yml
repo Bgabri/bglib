@@ -1,0 +1,32 @@
+name: CI
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: krdlab/setup-haxe@v1
+        with:
+          haxe-version: 4.3.6
+
+      - name: setup
+        run: |
+          haxe --version
+          haxelib install tink_testrunner
+          haxelib install tink_unittest
+          haxelib install checkstyle
+          haxelib install tink_cli
+
+      - name: checkstyle
+        run: |
+          haxelib run checkstyle -s src
+          haxelib run checkstyle -s tests
+
+      - name: tests
+        run: haxe tests.hxml
