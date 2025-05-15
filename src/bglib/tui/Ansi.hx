@@ -94,6 +94,11 @@ class Ansi {
     public static final showCursor:String = csi + "?25h";
     public static final nextLine:String   = csi + "E";
 
+    /**
+     * Moves the cursor by n lines.
+     * @param n lines
+     * @return String
+     **/
     public static function moveCursorY(n = 0):String {
         if (n == 0) return "";
         if (n < 0) {
@@ -103,6 +108,11 @@ class Ansi {
         return csi + '${n}B';
     }
 
+    /**
+     * Moves the cursor by n columns.
+     * @param n columns
+     * @return String
+     **/
     public static function moveCursorX(n = 0):String {
         if (n == 0) return "";
         if (n < 0) {
@@ -113,6 +123,9 @@ class Ansi {
     }
 
     #if debug
+    /**
+     * Test "every" ANSI escape codes.
+     **/
     public static function test() {
         for (i in 1...107) {
             @SuppressWarning("checkstyle:Trace")
@@ -214,6 +227,12 @@ class Ansi {
     }
 
     static var escaped:Bool = false;
+
+    /**
+     * Checks and parses an input from std in.
+     * @param code
+     * @return Input
+     **/
     public static function getCode(?code:Int):Input {
         // https://en.wikipedia.org/wiki/ANSI_escape_code
 
@@ -234,6 +253,11 @@ class Ansi {
         return Code(code);
     }
 
+    /**
+     * Converts the input into a string.
+     * @param i input enum
+     * @return String
+     **/
     public static function inputString(i:Input):String {
         return switch i {
             case Code(0): "null";
@@ -251,6 +275,9 @@ class Ansi {
     }
 
     #if debug
+    /**
+     * Test the input sequence.
+     **/
     public static function testCharInput() {
         while (true) {
             var code = Sys.getChar(false);

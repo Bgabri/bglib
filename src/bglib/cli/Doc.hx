@@ -7,14 +7,20 @@ import tink.cli.DocFormatter;
 using Lambda;
 using StringTools;
 
-typedef DocStringParam = {
+/**
+ * DocString @param spec.
+**/
+private typedef DocStringParam = {
     doc:String,
     ?name:String,
     ?type:String,
     ?optional:Bool,
 }
 
-typedef DocString = {
+/**
+ * DocString spec.
+**/
+private typedef DocString = {
     doc:String,
     params:Array<DocStringParam>,
     ?returns:DocStringParam,
@@ -22,8 +28,8 @@ typedef DocString = {
 
 /**
  * Helper class for building Doc.
- **/
- class DocBuilder {
+**/
+class DocBuilder {
     // TODO: make this a macro
     var doc:Doc;
 
@@ -42,16 +48,31 @@ typedef DocString = {
         return this;
     }
 
+    /**
+     * Set the smart indent.
+     * @param smartIndent enable
+     * @return DocBuilder
+    **/
     public function setSmartIndent(smartIndent:Bool):DocBuilder {
         doc.smartIndent = smartIndent;
         return this;
     }
 
+    /**
+     * Set the sub param descriptor.
+     * @param subParamDescriptor enable.
+     * @return DocBuilder
+    **/
     public function setSubParamDescriptor(subParamDescriptor:Bool):DocBuilder {
         doc.subParamDescriptor = subParamDescriptor;
         return this;
     }
 
+    /**
+     * Set the flag param descriptor.
+     * @param flagParamDescriptor enable.
+     * @return DocBuilder
+    **/
     public function setFlagParamDescriptor(
         flagParamDescriptor:Bool
     ):DocBuilder {
@@ -59,6 +80,11 @@ typedef DocString = {
         return this;
     }
 
+    /**
+     * Set the param descriptor delimiter.
+     * @param paramDescriptorDelimiter delimiter.
+     * @return DocBuilder
+    **/
     public function setParamDescriptorDelimiter(
         paramDescriptorDelimiter:String
     ):DocBuilder {
@@ -66,16 +92,31 @@ typedef DocString = {
         return this;
     }
 
+    /**
+     * Set the alias delimiter.
+     * @param aliasDelimiter delimiter.
+     * @return DocBuilder
+    **/
     public function setAliasDelimiter(aliasDelimiter:String):DocBuilder {
         doc.aliasDelimiter = aliasDelimiter;
         return this;
     }
 
+    /**
+     * Set the commands string.
+     * @param commandsStr The commands string.
+     * @return DocBuilder
+    **/
     public function setCommandsStr(commandsStr:String):DocBuilder {
         doc.commandsStr = commandsStr;
         return this;
     }
 
+    /**
+     * Set the flags string.
+     * @param flagsStr The flags string.
+     * @return DocBuilder
+    **/
     public function setFlagsStr(flagsStr:String):DocBuilder {
         doc.flagsStr = flagsStr;
         return this;

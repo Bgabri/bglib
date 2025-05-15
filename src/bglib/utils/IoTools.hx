@@ -3,6 +3,9 @@ package bglib.utils;
 import haxe.io.BytesBuffer;
 import haxe.io.Input;
 
+/**
+ * Helper class for reading from input.
+ **/
 class IoTools {
     /**
      * Reads a word from the input ending at a white space.

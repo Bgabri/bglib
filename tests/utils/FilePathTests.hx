@@ -1,14 +1,21 @@
 package utils;
 
 import tink.testrunner.Assertions;
-import tink.unit.AssertionBuffer;
 
 using bglib.utils.FilePath;
 
+/**
+ * Tests for the FilePath module.
+ * @return Assertions
+**/
 @:asserts
 class FilePathTests {
     public function new() {}
 
+    /**
+     * Tests for path normalization and equality.
+     * @return Assertions
+    **/
     public function equality():Assertions {
         var path:FilePath = "path/file";
         var empty:FilePath = "path////file";
@@ -25,6 +32,10 @@ class FilePathTests {
         return asserts.done();
     }
 
+    /**
+     * Tests for path concatenation.
+     * @return Assertions
+    **/
     public function concatenation():Assertions {
         var str1 = "str-1";
         var abs1:FilePath = "abs-1";

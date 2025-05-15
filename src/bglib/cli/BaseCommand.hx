@@ -3,9 +3,8 @@ package bglib.cli;
 import haxe.macro.Compiler;
 import haxe.macro.Context;
 import haxe.macro.Expr.Field;
-import haxe.macro.Expr;
-import haxe.macro.ExprTools;
-import haxe.macro.Type;
+import haxe.macro.Expr.MetadataEntry;
+import haxe.macro.Expr.TypePath;
 
 using Lambda;
 
@@ -14,11 +13,17 @@ using haxe.macro.Tools;
 using bglib.macros.Grain;
 using bglib.utils.PrimitiveTools;
 
+/**
+ * Macro parameters.
+ **/
 private typedef BaseCommandParam = {
     ?useMain:Bool,
     ?command:String
 };
 
+/**
+  * Convenience macro to build a tink cli command.
+ **/
 class BaseCommandMacro {
     static final metadata:String = ":baseCommand";
     static final metaParams:Array<MetaParam> = [
@@ -64,7 +69,7 @@ class BaseCommandMacro {
              * @param rest cli args
             **/
             @:defaultCommand
-            public function run(rest:tink.cli.Rest<Dynamic>) {
+            public function run(rest:tink.cli.Rest<Any>) {
                 if (help) printHelp();
                 try {
                     bglib.macros.UnPack.unpack($i{command}, rest);

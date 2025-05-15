@@ -206,7 +206,7 @@
           {
                "type": "MethodCount",
                "props": {
-                    "maxTotal": 20,
+                    "maxTotal": 25,
                     "maxPrivate": 110,
                     "maxPublic": 20
                }

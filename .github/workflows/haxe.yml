@@ -16,13 +16,9 @@ jobs:
         with:
           haxe-version: 4.3.6
 
-      - name: sanity
-        run: |
-          ls 
-          ls ${{ github.workspace }}
-
       - name: setup
         run: |
+          ls
           haxe --version
           haxelib install tink_testrunner
           haxelib install tink_unittest
@@ -31,8 +27,8 @@ jobs:
 
       - name: checkstyle
         run: |
-          haxelib run checkstyle -s src
-          haxelib run checkstyle -s tests
+          haxelib run checkstyle --exitcode -s src 
+          haxelib run checkstyle --exitcode -s tests
 
       - name: tests
         run: haxe tests.hxml

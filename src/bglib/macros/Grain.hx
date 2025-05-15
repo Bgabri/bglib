@@ -1,7 +1,6 @@
 package bglib.macros;
 
 import haxe.ds.Vector;
-import haxe.macro.Compiler;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Type;

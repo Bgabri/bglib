@@ -1,20 +1,26 @@
 package macros;
 
+import haxe.ds.Vector;
+
 import bglib.macros.UnpackingException;
 
 import tink.testrunner.Assertion;
 import tink.testrunner.Assertions;
 import tink.unit.Assert.assert;
-import tink.unit.AssertionBuffer;
 
 using bglib.macros.UnPack;
+using bglib.utils.Utils;
 
+/**
+ * Tests for the function unpacking macro.
+ * @return Assertions
+**/
 @:asserts
 class UnPackTests {
     public function new() {}
 
-    function multiply(a:Int, b:Int):Int {
-        return a * b;
+    function divide(a:Int, b:Int):Int {
+        return a.div(b);
     }
 
     function multiply3(?a:Int, b:Int, c:Int = 10):Int {
@@ -38,6 +44,10 @@ class UnPackTests {
         return '$a, $b';
     }
 
+    /**
+     * Tests for function unpacking with optional args.
+     * @return Assertions
+    **/
     public function funcUnpack():Assertions {
         asserts.assert(oFunc2.unpack([0]) == "null, 0");
         asserts.assert(oFunc2.unpack([0, 1]) == "0, 1");
@@ -53,8 +63,12 @@ class UnPackTests {
         return asserts.done();
     }
 
+    /**
+     * Tests for unpacking with to little args.
+     * @return Assertions
+    **/
     public function exceptionUnpack():Assertions {
-        var msg = "oFunc.unpack([0, 1]) (throws UnUnpackingException)";
+        var msg = "oFunc.unpack([0, 1]) (throws UnpackingException)";
         try {
             oFunc.unpack([0, 1]);
             return new Assertion(false, msg);
@@ -63,22 +77,35 @@ class UnPackTests {
         }
     }
 
+    /**
+     * Tests unpacking with arrays.
+     * @return Assertions
+    **/
     public function arrUnpack():Assertions {
         var as:Array<Int> = [2, 5, 7];
         asserts.assert(multiply3.unpack(as) == 70);
         return asserts.done();
     }
 
+    /**
+     * Tests unpacking with object access.
+     * @return Assertions
+    **/
     public function objUnpack():Assertions {
         var as = {
-            a: 3,
-            b: 5
+            b: 3,
+            a: 15
         };
-        return assert(multiply.unpack(as) == 15);
+        return assert(divide.unpack(as) == 5);
     }
 
+    /**
+     * Tests unpacking with vectors.
+     * @return Assertions
+    **/
     public function vecUnpack():Assertions {
-        var as:haxe.ds.Vector<Int> = new haxe.ds.Vector(2, 2);
-        return assert(multiply.unpack(as) == 4);
+        var as:Vector<Int> = Vector.fromArrayCopy([8, 2]);
+
+        return assert(divide.unpack(as) == 4);
     }
 }

@@ -1,23 +1,27 @@
 package bglib;
 
-import haxe.display.Display.MetadataTarget;
 import haxe.macro.Compiler;
-import haxe.macro.Expr;
 import haxe.macro.Context;
-import haxe.macro.Type;
 import haxe.macro.Expr.Field;
+import haxe.macro.Expr;
 
-using haxe.macro.Tools;
 using haxe.EnumTools;
 using haxe.macro.ExprTools;
+using haxe.macro.Tools;
 
-using bglib.utils.PrimitiveTools;
 using bglib.macros.Grain;
+using bglib.utils.PrimitiveTools;
 
+/**
+ * Macro parameters.
+ **/
 private typedef ExceptionHandlerParam = {
     var ?funcName:String;
 }
 
+/**
+ * Macro which adds "global" exception handling.
+ **/
 class ExceptionHandlerMacro {
     static final classMetadata:String = ":ExceptionHandler";
     static final metaParams:Array<MetaParam> = [
@@ -137,7 +141,7 @@ class ExceptionHandlerMacro {
  * 
  * @example
  * ```haxe
- * @:handleException
+ * @:handleException(?funcName:String = "main")
  * static function handle(e:Exception) {...}
  * ```
 **/

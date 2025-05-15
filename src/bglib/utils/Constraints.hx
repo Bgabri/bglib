@@ -1,6 +1,7 @@
 package bglib.utils;
 
 /*
+    ...
     private extern abstract Ordered<T>(T) from T to T {
     @:op("<")
     public function lt(other:Ordered<T>):Bool;
@@ -28,6 +29,9 @@ package bglib.utils;
     public function get(index:Int):T;
     }
  */
+/**
+ * Defines a measurable type.
+**/
 typedef Measurable = {
     public var length(default, null):Int;
 }

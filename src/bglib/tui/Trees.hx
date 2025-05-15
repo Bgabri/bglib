@@ -3,9 +3,9 @@ package bglib.tui;
 using bglib.utils.PrimitiveTools;
 
 /**
- * Defines the possible ANSI colours.
+ * Defines the possible ANSI colors.
 **/
-enum EColour {
+enum EColor {
     Black;
     Red;
     Green;
@@ -14,9 +14,9 @@ enum EColour {
     Magenta;
     Cyan;
     White;
-    Bright(c:EColour);
-    BackGround(c:EColour);
-    ForeGround(c:EColour);
+    Bright(c:EColor);
+    BackGround(c:EColor);
+    ForeGround(c:EColor);
     RGB(r:Int, g:Int, b:Int);
 }
 
@@ -26,7 +26,7 @@ enum EColour {
 private enum TreEnum {
     TString(s:String);
     TConcat(t1:TreEnum, t2:TreEnum);
-    TColour(c:EColour, t:TreEnum);
+    TColor(c:EColor, t:TreEnum);
     TBold(t:TreEnum);
     TFaint(t:TreEnum);
     TItalic(t:TreEnum);
@@ -44,21 +44,35 @@ private enum TreEnum {
 abstract Trees(TreEnum) from TreEnum to TreEnum {
     public var length(get, never):Int;
 
+    /**
+     * Returns the length of the string.
+     * @return Int
+    **/
     public function get_length():Int {
-        return size(this);
+        return lengthRec(this);
     }
 
-    static function size(tre:TreEnum):Int {
+    /**
+     * Recursively calculates the length of the string.
+     * @param tre to get the length.
+     * @return Int
+    **/
+    static function lengthRec(tre:TreEnum):Int {
         return switch tre {
             case TString(s): s.length;
-            case TConcat(t1, t2): size(t1) + size(t2);
-            case TColour(_, t): size(t);
-            case t: size(t.getParameters()[0]);
+            case TConcat(t1, t2): lengthRec(t1) + lengthRec(t2);
+            case TColor(_, t): lengthRec(t);
+            case t: lengthRec(t.getParameters()[0]);
         }
     }
 
-    static function parseColor(c:EColour):String {
-        function colorCode(c:EColour):Int {
+    /**
+     * Parses the color to its ANSI color code.
+     * @param c color enum
+     * @return String
+     **/
+    static function parseColor(c:EColor):String {
+        function colorCode(c:EColor):Int {
             return switch c {
                 case Black: 30;
                 case Red: 31;
@@ -90,11 +104,17 @@ abstract Trees(TreEnum) from TreEnum to TreEnum {
         return Ansi.csi + code + "m";
     }
 
+    /**
+     * Parses the Trees to its ANSI string.
+     * @param stack to parse.
+     * @param tre to parse.
+     * @return String
+    **/
     static function parse(stack:Array<String>, tre:TreEnum):String {
         stack = stack.copy();
 
         switch tre {
-            case TColour(c, _):
+            case TColor(c, _):
                 stack.push(parseColor(c));
             case TBold(_):
                 stack.push(Ansi.bold);
@@ -120,13 +140,11 @@ abstract Trees(TreEnum) from TreEnum to TreEnum {
         var parsed = switch tre {
             case TString(s):
                 if (!stack.empty()) {
-                    // stack.reverse();
                     s = stack.join("") + s + Ansi.reset;
-                    // stack.reverse();
                 }
                 s;
             case TConcat(t1, t2): parse(stack, t1) + parse(stack, t2);
-            case TColour(c, t): parse(stack, t);
+            case TColor(c, t): parse(stack, t);
             case t: parse(stack, t.getParameters()[0]);
         };
 
@@ -134,13 +152,13 @@ abstract Trees(TreEnum) from TreEnum to TreEnum {
     }
 
     /**
-     * Colour text using ANSI codes.
-     * @param c text colour
+     * Color text using ANSI codes.
+     * @param c text color
      * @param t text
      * @return Trees
     **/
-    public static function Colour(c:EColour, t:Trees):Trees {
-        return TColour(c, t);
+    public static function Color(c:EColor, t:Trees):Trees {
+        return TColor(c, t);
     }
 
     /**
@@ -186,7 +204,7 @@ abstract Trees(TreEnum) from TreEnum to TreEnum {
     public static function FastBlink(t:Trees):Trees return TFastBlink(t);
 
     /**
-     * Invert text colour using ANSI codes.
+     * Invert text color using ANSI codes.
      * @param t text
      * @return Trees
     **/

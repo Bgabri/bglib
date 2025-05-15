@@ -1,7 +1,7 @@
 package bglib.utils;
 
-import haxe.ds.ArraySort;
 import haxe.Exception;
+import haxe.ds.ArraySort;
 
 using Lambda;
 using StringTools;
@@ -255,7 +255,6 @@ class PrimitiveTools {
                 for (j in 0...length)
                     (Math.floor(j / Math.pow(10, digits - i)) % 10)
             ];
-            // var l = v.map(n -> n == 0 ? " " : '$n');
             buffer.add(spacing);
             buffer.add("  │ \x1b[2m");
             buffer.add(v.join(delim));
@@ -279,7 +278,9 @@ class PrimitiveTools {
 
             var spacing = repeat(
                 " ",
-                Math.floor(Utils.logb(10, ass.length)) - Math.floor(Utils.logb(10, i)));
+                Math.floor(Utils.logb(10, ass.length)) -
+                Math.floor(Utils.logb(10, i))
+            );
             if (i == 0) spacing = repeat(
                 " ", Math.floor(Utils.logb(10, ass.length)));
             buffer.add(spacing);
@@ -289,6 +290,14 @@ class PrimitiveTools {
         Sys.print(buffer.toString());
     }
 
+    /**
+     * Converts the matrix into an aligned table.
+     * @param ass matrix
+     * @param map converts the elements into a string
+     * @param delim separator
+     * @param length callback to get the elements size
+     * @return Array<String>
+     **/
     public static function tabular<T>(
         ass:Array<Array<T>>, ?map:(T) -> String, delim = " ",
         ?length:(v:T) -> Int
@@ -338,13 +347,13 @@ class PrimitiveTools {
         var t = stamp.getTime();
         var d = DateTools.parse(t);
 
-        var out = d.days == 0 ? '' : '${d.days}d ';
-        out += (d.hours < 10 ? '0' : '') + d.hours;
-        out += ":" + (d.minutes < 10 ? '0' : '') + d.minutes;
-        out += ":" + (d.seconds < 10 ? '0' : '') + d.seconds;
+        var out = d.days == 0 ? "" : '${d.days}d ';
+        out += (d.hours < 10 ? "0" : "") + d.hours;
+        out += ":" + (d.minutes < 10 ? "0" : "") + d.minutes;
+        out += ":" + (d.seconds < 10 ? "0" : "") + d.seconds;
         if (ms) {
             var m = Std.int(d.ms / 10);
-            out += "." + (m < 10 ? '0' : '') + m;
+            out += "." + (m < 10 ? "0" : "") + m;
         }
         return out;
     }

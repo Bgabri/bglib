@@ -5,6 +5,9 @@ import tink.unit.AssertionBuffer;
 
 using bglib.utils.PrimitiveTools;
 
+/**
+ * Enum for testing dynamicMatch.
+ **/
 enum B {
     singleS(a:String);
     doubleS(a:String, b:String);
@@ -14,6 +17,9 @@ enum B {
     doubleA(a:A, b:A);
 }
 
+/**
+ * Enum for testing dynamicMatch.
+ **/
 enum A {
     singleS(a:String);
     doubleS(a:String, b:String);
@@ -25,15 +31,24 @@ enum A {
     C(c:C);
 }
 
+/**
+ * class for testing dynamicMatch.
+ **/
 class C {
     public function new() {}
 }
 
+/**
+ * typedef for testing dynamicMatch.
+ **/
 typedef ETest = {
     var e:EnumValue;
     var pattern:String;
 }
 
+/**
+ * Tests for dynamic enum matching.
+ **/
 @:asserts
 class DynamicMatch {
     public function new() {}
@@ -51,6 +66,10 @@ class DynamicMatch {
         return asserts.done();
     }
 
+    /**
+     * Tests for wildcard (_) matching.
+     * @return Assertions
+     **/
     public function matchWildcard():Assertions {
         var tests:Array<ETest> = [
             {
@@ -73,6 +92,10 @@ class DynamicMatch {
         return assertTests(asserts, tests);
     }
 
+    /**
+     * Tests for basic type matching.
+     * @return Assertions
+     **/
     public function matchType():Assertions {
         var tests:Array<ETest> = [
             {
@@ -99,6 +122,10 @@ class DynamicMatch {
         return assertTests(asserts, tests);
     }
 
+    /**
+     * Tests fo dynamic matching with OR (|).
+     * @return Assertions
+     **/
     public function matchOrPattern():Assertions {
         var tests:Array<ETest> = [
             {
@@ -125,6 +152,10 @@ class DynamicMatch {
         return assertTests(asserts, tests);
     }
 
+    /**
+     * Tests for matches that should fail.
+     * @return Assertions
+     **/
     public function matchFail():Assertions {
         var tests:Array<ETest> = [
             {
@@ -155,6 +186,10 @@ class DynamicMatch {
         return asserts.done();
     }
 
+    /**
+     * Tests for matches that should throw ParseException.
+     * @return Assertions
+     **/
     public function matchParseException():Assertions {
         var e = B.singleS("a");
         var tests:Array<ETest> = [
@@ -167,10 +202,10 @@ class DynamicMatch {
         for (t in tests) {
             var msg = t.e + " == " + t.pattern;
             try {
-                trace(t.e.dynamicMatch(t.pattern));
-                asserts.assert(false, msg + " throws ParseException");
+                t.e.dynamicMatch(t.pattern);
+                asserts.assert(false, msg + " (throws ParseException)");
             } catch (e:ParseException) {
-                asserts.assert(true, msg + " throws ParseException");
+                asserts.assert(true, msg + " (throws ParseException)");
             }
         }
         return asserts.done();

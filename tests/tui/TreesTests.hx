@@ -1,16 +1,22 @@
 package tui;
 
-import bglib.tui.Ansi;
 import bglib.tui.Trees.*;
 import bglib.tui.Trees;
 
 import tink.testrunner.Assertions;
 import tink.unit.Assert.assert;
 
+/**
+ * Tests for the ANSI Trees module.
+**/
 @:asserts
 class TreesTests {
     public function new() {}
 
+    /**
+     * Tests for concatenation.
+     * @return Assertions
+    **/
     public function concatenation():Assertions {
         var abs:Trees = " abs";
         var enm:Trees = Bold(Italic(" enm"));
@@ -31,17 +37,29 @@ class TreesTests {
         return asserts.done();
     }
 
-    public function colourBright():Assertions {
-        var expr = Colour(Bright(Red), "enm");
+    /**
+     * Tests for bright colors.
+     * @return Assertions
+    **/
+    public function colorBright():Assertions {
+        var expr = Color(Bright(Red), "enm");
         return assert(expr.toString() == "\x1b[91menm\x1b[0m");
     }
 
-    public function colourBackGround():Assertions {
-        var expr = Colour(BackGround(Bright(Red)), "enm");
+    /**
+     * Tests for background colors.
+     * @return Assertions
+    **/
+    public function colorBackGround():Assertions {
+        var expr = Color(BackGround(Bright(Red)), "enm");
 
         return assert(expr.toString() == "\x1b[101menm\x1b[0m");
     }
 
+    /**
+     * Tests for crossed text.
+     * @return Assertions
+    **/
     public function cross():Assertions {
         var expr:Trees = Bold(Cross("Hello") + " World");
         asserts.assert(expr.length == 11);
@@ -51,6 +69,10 @@ class TreesTests {
         return asserts.done();
     }
 
+    /**
+     * Tests for bold text.
+     * @return Assertions
+    **/
     public function bold():Assertions {
         var t = Bold("Hello");
         asserts.assert(t.length == 5);
@@ -58,14 +80,18 @@ class TreesTests {
         return asserts.done();
     }
 
+    /**
+     * Tests for encapsulated text.
+     * @return Assertions
+    **/
     public function encapsulate():Assertions {
-        var aaa = Colour(Red, "aaa" + Colour(Blue, "bbb") + "ccc");
+        var aa = Color(Red, "aa" + Color(Blue, "bb") + "cc");
         asserts.assert(
-            aaa == "\x1b[31maaa\x1b[0m\x1b[31m\x1b[34mbbb\x1b[0m\x1b[31mccc\x1b[0m"
+            aa == "\x1b[31maa\x1b[0m\x1b[31m\x1b[34mbb\x1b[0m\x1b[31mcc\x1b[0m"
         );
 
-        var inner = Colour(Bright(Blue), "hello");
-        var expr = Colour(Red, inner);
+        var inner = Color(Bright(Blue), "hello");
+        var expr = Color(Red, inner);
         asserts.assert(expr.length == 5);
         asserts.assert(expr.toString() == "\x1b[31m\x1b[94mhello\x1b[0m");
         return asserts.done();

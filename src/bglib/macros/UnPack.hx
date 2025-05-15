@@ -1,6 +1,5 @@
 package bglib.macros;
 
-import haxe.Constraints.Function;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 
@@ -47,7 +46,9 @@ class UnPack {
                 }
             }
             if (${args}.length < $v{requiredArgs}) {
-                throw new bglib.macros.UnpackingException(${args}.length, $v{requiredArgs});
+                throw new bglib.macros.UnpackingException(
+                    ${args}.length, $v{requiredArgs}
+                );
             }
             $expr;
         };

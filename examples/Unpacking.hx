@@ -1,5 +1,3 @@
-import haxe.Rest;
-
 using bglib.macros.UnPack;
 
 class Unpacking {
