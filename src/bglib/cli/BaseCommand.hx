@@ -99,7 +99,7 @@ class BaseCommandMacro {
             @:handleException
             static function handleException(e:haxe.Exception) {
                 Sys.print("Internal error: " + e.message);
-                Sys.print(haxe.CallStack.toString(e.stack));
+                Sys.println(haxe.CallStack.toString(e.stack));
                 Sys.exit(1);
             }
 
@@ -166,6 +166,8 @@ class BaseCommandMacro {
  *  static function handleException();
  * 
  * Implement a function to override it.
+ * 
+ * @:baseCommand(useMain:Bool = false, command:String = "cmd")
 **/
 @:autoBuild(bglib.cli.BaseCommandMacro.build())
 interface BaseCommand {}

@@ -86,6 +86,8 @@ class SingletonMacro {
 
 /**
  * Implements a singleton interface via a macro.
+ * 
+ * @:singleton(fieldName:String = "instance")
 **/
 @:autoBuild(bglib.oops.SingletonMacro.build())
 interface Singleton {}

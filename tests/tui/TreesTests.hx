@@ -57,4 +57,12 @@ class TreesTests {
         asserts.assert(t.toString() == "\x1b[1mHello\x1b[0m");
         return asserts.done();
     }
+
+    public function encapsulate():Assertions {
+        var inner = Colour(Bright(Blue), "hello");
+        var expr = Colour(Red, inner);
+        asserts.assert(expr.length == 5);
+        asserts.assert(expr.toString() == "\x1b[31m\x1b[94mhello\x1b[0m");
+        return asserts.done();
+    }
 }

@@ -152,7 +152,7 @@ abstract FilePath(FilePathImp) from FilePathImp to FilePathImp {
     @:op(a + b)
     @:commutative
     public inline function appendInv(path:FilePath):FilePath {
-        return Path.join([this.toString(), path]);
+        return Path.join([path, this.toString()]);
     }
 
     /**

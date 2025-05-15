@@ -28,7 +28,15 @@ class Unpacking {
         trace(a, b);
     }
 
+    static function dFunc(a:Int, b:Int) {
+        var c:Int = a + b;
+        trace(c);
+    }
+
     static function main() {
+        var as:Array<Dynamic> = ["hello", "hello"];
+        dFunc.unpack(as);
+
         oFunc2.unpack([0]);
         oFunc2.unpack([0, 1]);
 

@@ -119,9 +119,12 @@ abstract Trees(TreEnum) from TreEnum to TreEnum {
 
         var parsed = switch tre {
             case TString(s):
-                if (stack.empty()) {
-                    s;
-                } else stack.join("") + s + Ansi.reset;
+                if (!stack.empty()) {
+                    stack.reverse();
+                    s = stack.join("") + s + Ansi.reset;
+                    stack.reverse();
+                }
+                s;
             case TConcat(t1, t2): parse(stack, t1) + parse(stack, t2);
             case TColour(c, t): parse(stack, t);
             case t: parse(stack, t.getParameters()[0]);
@@ -231,6 +234,24 @@ abstract Trees(TreEnum) from TreEnum to TreEnum {
     @:op(a + b)
     public function concatInv(tre:Trees):Trees {
         return TConcat(tre, this);
+    }
+
+    /**
+     * Converts this ansi text to its escaped string.
+     * @return String
+    **/
+    public function escaped():String {
+        var s = parse([], this);
+
+        var buf = new StringBuf();
+        for (c in s) {
+            if (c == Ansi.esc.charCodeAt(0)) {
+                buf.add("\\x1b");
+            } else {
+                buf.addChar(c);
+            }
+        }
+        return buf.toString();
     }
 
     @:to

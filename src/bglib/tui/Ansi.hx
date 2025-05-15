@@ -214,10 +214,12 @@ class Ansi {
     }
 
     static var escaped:Bool = false;
-    public static function getCode():Input {
+    public static function getCode(?code:Int):Input {
         // https://en.wikipedia.org/wiki/ANSI_escape_code
 
-        var code = Sys.getChar(false);
+        if (code == null) {
+            code = Sys.getChar(false);
+        }
         if (escaped == true && code == "[".code) {
             escaped = false;
             return inputSequence();
