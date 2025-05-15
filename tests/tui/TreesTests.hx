@@ -59,6 +59,11 @@ class TreesTests {
     }
 
     public function encapsulate():Assertions {
+        var aaa = Colour(Red, "aaa" + Colour(Blue, "bbb") + "ccc");
+        asserts.assert(
+            aaa == "\x1b[31maaa\x1b[0m\x1b[31m\x1b[34mbbb\x1b[0m\x1b[31mccc\x1b[0m"
+        );
+
         var inner = Colour(Bright(Blue), "hello");
         var expr = Colour(Red, inner);
         asserts.assert(expr.length == 5);

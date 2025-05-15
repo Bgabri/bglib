@@ -67,7 +67,7 @@ class FilePathImp extends Path {
 
     /**
      * Normalizes the path name.
-     * `path/././to/../file` -> `/path/file`
+     * `path/././to/../file/` -> `path/file`
      * @return FilePath normalized
     **/
     public function normalized():FilePath {

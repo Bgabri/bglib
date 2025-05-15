@@ -9,6 +9,7 @@ import tink.unit.TestBatch;
 import tui.TreesTests;
 
 import utils.DynamicMatch;
+import utils.FilePathTests;
 
 using tink.CoreApi;
 
@@ -18,6 +19,7 @@ using tink.CoreApi;
 class Run {
     static function main() {
         Runner.run(TestBatch.make([
+            new FilePathTests(),
             new TreesTests(),
             new DynamicMatch(),
             new UnPackTests(),

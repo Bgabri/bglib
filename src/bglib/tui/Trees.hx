@@ -120,9 +120,9 @@ abstract Trees(TreEnum) from TreEnum to TreEnum {
         var parsed = switch tre {
             case TString(s):
                 if (!stack.empty()) {
-                    stack.reverse();
+                    // stack.reverse();
                     s = stack.join("") + s + Ansi.reset;
-                    stack.reverse();
+                    // stack.reverse();
                 }
                 s;
             case TConcat(t1, t2): parse(stack, t1) + parse(stack, t2);
