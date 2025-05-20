@@ -12,7 +12,7 @@ class DequeTools {
      * @param q the deque
      * @param f the function to call
     **/
-    public static function empty<T>(q:Deque<T>, f:(v:T) -> Void) {
+    public static function emptyOut<T>(q:Deque<T>, f:(v:T) -> Void) {
         while (true) {
             var v:T = q.pop(false);
             if (v == null) break;

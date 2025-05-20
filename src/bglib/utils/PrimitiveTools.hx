@@ -1,6 +1,5 @@
 package bglib.utils;
 
-import haxe.Exception;
 import haxe.ds.ArraySort;
 
 using Lambda;
@@ -203,6 +202,21 @@ class PrimitiveTools {
     }
 
     /**
+     * Concatenates two arrays into one modifying as in its place.
+     * @param as the first array
+     * @param bs the second array
+     * @return Array<T>
+    **/
+    public static function concatenated<T>(
+        as:Array<T>, bs:Array<T>
+    ):Array<T> {
+        for (b in bs) {
+            as.push(b);
+        }
+        return as;
+    }
+
+    /**
      * Shallow copy of a 2d array.
      * @param ass the matrix
      * @return Array<Array<T>>
@@ -278,9 +292,7 @@ class PrimitiveTools {
 
             var spacing = repeat(
                 " ",
-                Math.floor(Utils.logb(10, ass.length)) -
-                Math.floor(Utils.logb(10, i))
-            );
+                Math.floor(Utils.logb(10, ass.length)) - Math.floor(Utils.logb(10, i)));
             if (i == 0) spacing = repeat(
                 " ", Math.floor(Utils.logb(10, ass.length)));
             buffer.add(spacing);
@@ -297,7 +309,7 @@ class PrimitiveTools {
      * @param delim separator
      * @param length callback to get the elements size
      * @return Array<String>
-     **/
+    **/
     public static function tabular<T>(
         ass:Array<Array<T>>, ?map:(T) -> String, delim = " ",
         ?length:(v:T) -> Int
@@ -461,14 +473,5 @@ class PrimitiveTools {
 
         var eArgs = e.getParameters();
         return all(zip(eArgs, args), (p) -> dynamicMatch(p.a, p.b));
-    }
-}
-
-/**
- * Exception when parsing.
-**/
-class ParseException extends Exception {
-    public function new(message:String) {
-        super(message);
     }
 }

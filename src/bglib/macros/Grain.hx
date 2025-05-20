@@ -1,5 +1,6 @@
 package bglib.macros;
 
+import haxe.Exception;
 import haxe.ds.Vector;
 import haxe.macro.Context;
 import haxe.macro.Expr;
@@ -84,21 +85,49 @@ class Grain {
      * @return MetadataEntry
     **/
     @:noUsing
-    public static function getLocalClassMetadata(name:String):MetadataEntry {
+    public static function getLocalClassMetadata(
+        name:String, required:Bool = false
+    ):MetadataEntry {
         var localType = Context.getLocalClass().get();
         var classMetadata:Array<MetadataEntry> = localType.meta.get();
-        return classMetadata.find((md) -> md.name == name);
+        var entry = null;
+        for (i => m in classMetadata) {
+            if (m.name == name) {
+                if (entry == null) entry = m;
+                else {
+                    entry.params = entry.params.concat(m.params);
+                }
+            }
+        }
+
+        if (required && entry == null) {
+            var pos = Context.getLocalClass()
+                .get()
+                .pos;
+            Context.error("Missing metadata entry: @" + name, pos);
+        }
+        return entry;
     }
 
     static function setMetaExtractField(d:Any, f:MetaParam, p:Expr):Void {
-        if (f.extractValue != null && f.extractValue == true) {
-            try {
-                Reflect.setField(d, f.name, p.getValue());
-            } catch (e) {
-                Context.error("unable to extract value", p.pos);
-            }
-        } else {
+        if (f.extractValue == null || f.extractValue == false) {
             Reflect.setField(d, f.name, p);
+            return;
+        }
+        try {
+            if (f.type != "Class") {
+                Reflect.setField(d, f.name, p.getValue());
+                return;
+            }
+            switch (p.expr) {
+                case EConst(CIdent(v)):
+                    var cType = Context.getType(v).getClass();
+                    Reflect.setField(d, f.name, cType);
+                case _:
+                    throw "";
+            }
+        } catch (e) {
+            Context.error("Invalid param, expected: " + parseParam(f), p.pos);
         }
     }
 
@@ -201,12 +230,14 @@ typedef MetaParam = {
     var name:String;
 
     /**
-     * Check bglib.utils.PrimitiveTools for the pattern.
+     * The pattern of the ExprDef to match.
+     * Check bglib.utils.PrimitiveTools for usage.
     **/
     var pattern:String;
 
     /**
      * The type of the parameter, mostly used for error reporting.
+     * Except for the type `Class`.
     **/
     var type:String;
 
