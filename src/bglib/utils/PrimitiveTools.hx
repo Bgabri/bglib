@@ -1,5 +1,6 @@
 package bglib.utils;
 
+import haxe.Constraints.Constructible;
 import haxe.ds.ArraySort;
 
 using Lambda;
@@ -207,9 +208,7 @@ class PrimitiveTools {
      * @param bs the second array
      * @return Array<T>
     **/
-    public static function concatenated<T>(
-        as:Array<T>, bs:Array<T>
-    ):Array<T> {
+    public static function concatenated<T>(as:Array<T>, bs:Array<T>):Array<T> {
         for (b in bs) {
             as.push(b);
         }
@@ -473,5 +472,24 @@ class PrimitiveTools {
 
         var eArgs = e.getParameters();
         return all(zip(eArgs, args), (p) -> dynamicMatch(p.a, p.b));
+    }
+
+    /**
+     * Creates a copy of the object, using reflection.
+     * Does not call the constructor.
+     * @param a to copy
+     * @return T
+    **/
+    public static function copy<T>(a:T):T {
+        var cls:Class<T> = Type.getClass(a);
+        var b:T = Type.createEmptyInstance(cls);
+        var fields = Type.getInstanceFields(cls); 
+        for (field in fields) {
+            var val:Dynamic = Reflect.field(a, field);
+            if (!Reflect.isFunction(val)) {
+                Reflect.setField(b, field, val);
+            }
+        }
+        return b;
     }
 }

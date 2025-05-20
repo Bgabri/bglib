@@ -80,6 +80,22 @@ class Grain {
     }
 
     /**
+     * Joins the fields, duplicates on the left are prioritized.
+     * @param as array
+     * @param bs array
+     * @return Array<Field>
+     **/
+    public static function leftJoin(
+        as:Array<Field>, bs:Array<Field>
+    ):Array<Field> {
+        for (b in bs) {
+            var found = as.any(a -> a.name == b.name);
+            if (!found) as.push(b);
+        }
+        return as;
+    }
+
+    /**
      * Gets the metadata entry from the top of local class.
      * @param name of the metadata
      * @return MetadataEntry

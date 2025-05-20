@@ -25,9 +25,7 @@ class B extends A {
 class ABuilder implements Builder {}
 
 @:builder(B)
-// @:builder(false)
-// class BBuilder extends ABuilder {}
-class BBuilder implements Builder {}
+class BBuilder extends ABuilder {}
 
 class NoOne implements Singleton {
     function new() {
@@ -38,8 +36,13 @@ class NoOne implements Singleton {
 class Oops implements Singleton {
     static function main() {
         var bb = new BBuilder();
-        bb.setA("A").setB("B");
-        trace(bb.build());
-
+        // bb.setA("A").setB("B");
+        bb.b("1");
+        var b1 = bb.build();
+        bb.a("banana");
+        bb.b("2");
+        var b2 = bb.build();
+        trace(b1);
+        trace(b2);
     }
 }

@@ -18,8 +18,10 @@ using bglib.macros.Grain;
 using bglib.utils.PrimitiveTools;
 
 private typedef BuilderBuildParams = {
-    var useInherited:Bool;
     var product:ClassType;
+    var ?useInherited:Bool;
+    // var ?productName:String;
+    // var ?buildMethodName:String;
 }
 
 private typedef ProductField = {
@@ -68,19 +70,15 @@ class BuilderMacro {
         return fields;
     }
 
-    static function addBuilderField(field:ProductField):Array<Field> {
+    static function buildBuilderProductField(field:ProductField):Array<Field> {
         var fieldName = field.name;
-        var setFieldMethodName =
-            "set" +
-            fieldName.charAt(0).toUpperCase() +
-            fieldName.substr(1);
+        var setFieldMethodName = fieldName;
         var complexType = field.classField.type.toComplexType();
 
         var newClass = macro class {
-            private var $fieldName:$complexType;
-
             public function $setFieldMethodName(v : $complexType) {
-                this.$fieldName = v;
+                @:privateAccess
+                obj.$fieldName = v;
                 return this;
             }
         }
@@ -88,31 +86,20 @@ class BuilderMacro {
         return newClass.fields;
     }
 
-    static function buildBuilderFields(
+    static function buildBuilderProductFields(
         prodFields:Array<ProductField>
     ):Array<Field> {
-        var builderFields = Context.getBuildFields();
-        var builderFieldNames = builderFields.map((f) -> f.name);
+        var fields = [];
 
         for (prodField in prodFields) {
-            if (builderFieldNames.contains(prodField.name)) continue;
-
-            builderFields.concatenated(addBuilderField(prodField));
+            fields.concatenated(buildBuilderProductField(prodField));
         }
 
-        var pos = Context.getLocalClass()
-            .get()
-            .pos;
-
-        builderFields.iter((f) -> {
-            f.pos = pos;
-        });
-
-        return builderFields;
+        return fields;
     }
 
-    static function addBuilderBuildField(
-        prod:ClassType, builderFields:Array<ProductField>
+    static function buildBuilderBuildField(
+        prod:ClassType, extending:Bool
     ):Array<Field> {
         var prodName = prod.name;
         if (prod.module != null && prod.module != "") {
@@ -122,35 +109,70 @@ class BuilderMacro {
         var complexType = Grain.safeGetType(prodName).toComplexType();
         var typePath = prod.toTypePath();
 
-        var setExprs:Array<Expr> = [];
-        for (field in builderFields) {
-            var fieldName = field.name;
-            setExprs.push(
-                macro obj.$fieldName = this.$fieldName
-            );
-        }
+        var constructor = macro class {
+            var obj:Dynamic; // TODO: change to static type
 
-        var newClass = macro class {
-            public function new() {}
+            public function new() {
+                obj = new $typePath();
+            }
+        };
 
+        var inheritConstructor = macro class {
+            public function new() {
+                super();
+                obj = new $typePath();
+            }
+        };
+
+        var buildMethod = macro class {
             public function build():$complexType {
-                var obj = new $typePath();
-                $b{setExprs};
-                return obj;
+                return bglib.utils.PrimitiveTools.copy(obj);
             }
         }
 
-        return newClass.fields;
+        var inheritBuildMethod = macro class {
+            override public function build():$complexType {
+                return bglib.utils.PrimitiveTools.copy(obj);
+            }
+        }
+
+        var fields = [];
+        if (extending) {
+            fields = inheritConstructor.fields;
+            fields.push(inheritBuildMethod.fields[0]);
+        } else {
+            fields = constructor.fields;
+            fields.push(buildMethod.fields[0]);
+        }
+
+        return fields;
     }
 
     static function makeBuilderFields(
-        product:ClassType, ?useInherited:Bool = true
+        product:ClassType, ?useInherited:Bool = false
     ):Array<Field> {
         var prodFields = getProductFields(product, useInherited);
-        var buildFields = buildBuilderFields(prodFields);
-        var fields = addBuilderBuildField(product, prodFields);
-        Sys.println("");
-        return fields.concat(buildFields);
+        var newFields = buildBuilderProductFields(prodFields);
+
+        var extending = !Context.getLocalClass()
+            .get()
+            .interfaces.any((i) -> i.t.toString() == "bglib.oops.Builder");
+
+        var buildFields = buildBuilderBuildField(product, extending);
+        newFields.concatenated(buildFields);
+
+        var contextPos = Context.getLocalClass()
+            .get()
+            .pos;
+
+        newFields.iter((f) -> {
+            f.pos = contextPos;
+        });
+
+        var fields = Context.getBuildFields();
+        fields.leftJoin(newFields);
+
+        return fields;
     }
     #end
 
@@ -171,9 +193,6 @@ class BuilderMacro {
 @:autoBuild(bglib.oops.BuilderMacro.build())
 interface Builder {}
 
-interface Buildable<T> {
-    /**
-     * @return Builder
-    **/
+interface Buildable {
     function builder():Builder;
 }
