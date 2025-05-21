@@ -483,11 +483,11 @@ class PrimitiveTools {
     public static function copy<T>(a:T):T {
         var cls:Class<T> = Type.getClass(a);
         var b:T = Type.createEmptyInstance(cls);
-        var fields = Type.getInstanceFields(cls); 
-        for (field in fields) {
+        var fields = Type.getInstanceFields(cls);
+        for (field in fields) { // TODO: doesn't work non real vars
             var val:Dynamic = Reflect.field(a, field);
-            if (!Reflect.isFunction(val)) {
-                Reflect.setField(b, field, val);
+            if (val != null && !Reflect.isFunction(val)) {
+                Reflect.setProperty(b, field, val);
             }
         }
         return b;

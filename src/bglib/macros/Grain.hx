@@ -57,7 +57,11 @@ class Grain {
      * @return TypePath
     **/
     public static function toTypePath(bType:BaseType):TypePath {
+        // TODO: check if this is correct
         var p = bType.module.split(".");
+        // pack.Module.Type
+        // name = "Module"
+        // sub = "Type"
         return {
             pack: bType.pack,
             name: p.pop(),
@@ -84,7 +88,7 @@ class Grain {
      * @param as array
      * @param bs array
      * @return Array<Field>
-     **/
+    **/
     public static function leftJoin(
         as:Array<Field>, bs:Array<Field>
     ):Array<Field> {

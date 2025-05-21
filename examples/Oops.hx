@@ -1,10 +1,15 @@
 import bglib.oops.*;
 
+// class A implements Buildable {
 class A {
     public var a:String;
 
     public function new() {
         a = "hello";
+    }
+
+    public static function builder():ABuilder {
+        return new ABuilder();
     }
 }
 
@@ -18,6 +23,10 @@ class B extends A {
 
     public function toString():String {
         return a + " " + b;
+    }
+
+    public static function builder():BBuilder {
+        return new BBuilder();
     }
 }
 
@@ -35,7 +44,7 @@ class NoOne implements Singleton {
 
 class Oops implements Singleton {
     static function main() {
-        var bb = new BBuilder();
+        var bb = B.builder();
         // bb.setA("A").setB("B");
         bb.b("1");
         var b1 = bb.build();

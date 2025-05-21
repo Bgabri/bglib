@@ -1,5 +1,7 @@
 package utils;
 
+import bglib.utils.ParseException;
+
 import tink.testrunner.Assertions;
 import tink.unit.AssertionBuffer;
 
