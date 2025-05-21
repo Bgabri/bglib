@@ -1,25 +1,21 @@
+package bglib.oops;
+
 /**
  * TODO: builder options (productName, buildMethodName)
  * TODO: can finals and constructor vars be set?
- * TODO: product field metadata (exclude/useFunction, methodName)
  * TODO: buildable
  * TODO: Error pos msging
  * 
 **/
-package bglib.oops;
-
 import haxe.macro.Compiler;
 import haxe.macro.Context;
-import haxe.macro.Expr.ExprDef;
 import haxe.macro.Expr.Field;
-import haxe.macro.Expr.Function;
 import haxe.macro.Expr.FunctionArg;
 import haxe.macro.Expr.MetadataEntry;
-import haxe.macro.Expr.TypeParamDecl;
 import haxe.macro.Type.ClassField;
 import haxe.macro.Type.ClassType;
-import haxe.macro.Type.VarAccess;
-import haxe.macro.Type;
+import haxe.macro.Type.TVar;
+import haxe.macro.Type.TypedExpr;
 
 using Lambda;
 using StringTools;

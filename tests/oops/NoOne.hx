@@ -17,3 +17,13 @@ class NoOne implements Singleton {
     public var field:String = "hello";
     function new() {}
 }
+
+/**
+ * Singleton with inheritance.
+ **/
+class NoOneChild extends NoOne {
+    function new () {
+        super();
+        field = "hello from child";
+    }
+}

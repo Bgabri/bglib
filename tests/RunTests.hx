@@ -1,6 +1,7 @@
 
 import macros.UnPackTests;
 
+import oops.BuilderTests;
 import oops.SingletonTests;
 
 import tink.testrunner.Runner;
@@ -16,7 +17,7 @@ using tink.CoreApi;
 /**
  * Entry point of the test suite.
  **/
-class Run {
+class RunTests {
     static function main() {
         Runner.run(TestBatch.make([
             new FilePathTests(),
@@ -24,6 +25,7 @@ class Run {
             new DynamicMatch(),
             new UnPackTests(),
             new SingletonTests(),
+            new BuilderTests(),
         ])).handle(Runner.exit);
     }
 }

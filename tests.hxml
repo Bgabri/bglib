@@ -7,5 +7,5 @@
 
 -w -WDeprecated
 
---main Run
+--main RunTests
 --interp

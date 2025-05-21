@@ -14,6 +14,7 @@ class A {
 }
 
 class B extends A {
+    public var c:String;
     public var b:String;
 
     public function new() {
@@ -21,8 +22,14 @@ class B extends A {
         super();
     }
 
+    @:builderField(false)
+    public function ssss(a:A, ?b:Int, s:String = "ssss"):String {
+        trace(a, b, s);
+        return s;
+    }
+
     public function toString():String {
-        return a + " " + b;
+        return a + " " + b + " " + c;
     }
 
     public static function builder():BBuilder {
@@ -45,7 +52,6 @@ class NoOne implements Singleton {
 class Oops implements Singleton {
     static function main() {
         var bb = B.builder();
-        // bb.setA("A").setB("B");
         bb.b("1");
         var b1 = bb.build();
         bb.a("banana");
