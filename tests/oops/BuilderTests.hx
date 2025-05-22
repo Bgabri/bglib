@@ -54,8 +54,11 @@ class ABuilder implements Builder {}
 @:builder(B, true)
 class BBuilder implements Builder {}
 
-@:builder(B)
+@:builder(B, false)
 class ABBuilder extends ABuilder {}
+
+@:builder(B, "customObject", "customBuild")
+class CustomBuilder implements Builder {}
 
 @:asserts
 class BuilderTests {
@@ -79,6 +82,11 @@ class BuilderTests {
         var bBFields = Type.getInstanceFields(BBuilder);
         asserts.assert(bBFields.any(f -> f == "a"));
         asserts.assert(bBFields.any(f -> f == "b"));
+        var bb = B.builder();
+        var b = bb.a("hello")
+            .b("world")
+            .build();
+        asserts.assert('$b' == "/hello world/");
         return asserts.done();
     }
 
@@ -107,6 +115,15 @@ class BuilderTests {
         asserts.assert('$a3' == "/world/");
         asserts.assert('$a1' == '$a2');
         asserts.assert('$a1' != '$a3');
+        return asserts.done();
+    }
+
+    public function customMethods():Assertions {
+        var fields = Type.getInstanceFields(CustomBuilder);
+
+        asserts.assert(fields.any(f -> f == "customObject"));
+        asserts.assert(fields.any(f -> f == "get_customObject"));
+        asserts.assert(fields.any(f -> f == "customBuild"));
         return asserts.done();
     }
 

@@ -32,8 +32,8 @@ class B extends A {
         return a + " " + b + " " + c;
     }
 
-    public static function builder():BBuilder {
-        return new BBuilder();
+    public static function builder():ABBuilder {
+        return new ABBuilder();
     }
 }
 
@@ -41,7 +41,10 @@ class B extends A {
 class ABuilder implements Builder {}
 
 @:builder(B)
-class BBuilder extends ABuilder {}
+class ABBuilder extends ABuilder {}
+
+@:builder(B, "pppp", "llll")
+class C implements Builder {}
 
 class NoOne implements Singleton {
     function new() {
@@ -51,6 +54,9 @@ class NoOne implements Singleton {
 
 class Oops implements Singleton {
     static function main() {
+        var fields = Type.getInstanceFields(C);
+        trace(fields);
+
         var bb = B.builder();
         bb.b("1");
         var b1 = bb.build();

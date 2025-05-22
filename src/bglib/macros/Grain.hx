@@ -51,6 +51,26 @@ class Grain {
         };
     }
 
+
+    /**
+     * Gets the fields of a product.
+     * @param product the class to be built
+     * @param inherit if the fields should be inherited
+     * @return Array<ProductField>
+    **/
+    public static function getClassFields(
+        product:ClassType, inherit:Bool
+    ):Array<ClassField> {
+        var fields = product.fields.get();
+
+        if (inherit && product.superClass != null) {
+            var superClass = product.superClass.t.get();
+            fields.concatenated(getClassFields(superClass, inherit));
+        }
+
+        return fields;
+    }
+
     /**
      * Converts a base type into its type path.
      * @param bType the base type
@@ -269,6 +289,6 @@ typedef MetaParam = {
     **/
     var type:String;
 
-    var ?optional:Bool;
+    var ?optional:Bool; // change to required?
     var ?extractValue:Bool;
 }
