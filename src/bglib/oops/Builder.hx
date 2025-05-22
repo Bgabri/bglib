@@ -4,7 +4,6 @@ package bglib.oops;
  * TODO: builder options (productName, buildMethodName)
  * TODO: can finals and constructor vars be set?
  * TODO: buildable
- * TODO: Error pos msging
  * 
 **/
 import haxe.macro.Compiler;
@@ -31,6 +30,8 @@ using bglib.utils.PrimitiveTools;
 private typedef BuilderBuildParams = {
     var product:ClassType;
     var ?useInherited:Bool;
+    var ?productField:String;
+    var ?buildMethod:String;
 }
 
 private typedef ProductFieldParam = {
@@ -47,14 +48,28 @@ class BuilderMacro {
     static final metaParams:Array<MetaParam> = [
         {
             name: "product",
-            type: "Class", // TODO: fails on module.Class
-            pattern: "EConst(_)",
+            type: "Class",
+            pattern: "EConst(_) | EField(_, _, _)",
             extractValue: true,
         },
         {
             name: "useInherited",
             type: "Bool",
             pattern: "EConst(CIdent(_))",
+            optional: true,
+            extractValue: true,
+        },
+        {
+            name: "productField",
+            type: "String",
+            pattern: "EConst(CString(_))",
+            optional: true,
+            extractValue: true,
+        },
+        {
+            name: "buildMethod",
+            type: "String",
+            pattern: "EConst(CString(_))",
             optional: true,
             extractValue: true,
         }
@@ -226,21 +241,24 @@ class BuilderMacro {
     static function buildBuilderBuildField(
         prod:ClassType, extending:Bool
     ):Array<Field> {
-        var prodName = prod.module; // TODO: get correct path
-        // trace(prod.module, prod.pack, prod.name);
-        // if (prod.module != null && prod.module != "") {
-        //     prodName = prod.module + "." + prodName;
-        // }
         var complexType = Grain.safeGetType(prod.name).toComplexType();
         var typePath = prod.toTypePath();
+        var classDotPathExpr = complexType.toString()
+            .split(".")
+            .toFieldExpr()
+            .rePos(prod.pos);
+        var classDotPathNoModule = prod.pack.concat([prod.name])
+            .toFieldExpr()
+            .rePos(prod.pos);
 
         var mClass = macro class {
-            // TODO: change to static type ($complexType)
-            // dynamic doesn't work with hl and non real vars
+            // TODO: change to static type ($complexType), breaks inheritance
+            // dynamic doesn't work well with hl and non real vars
             var obj:Dynamic;
 
-            @:allow($i{prodName})
-            public function new() {
+            @:allow(${classDotPathExpr})
+            @:allow(${classDotPathNoModule})
+            function new() {
                 obj = new $typePath();
             }
 
@@ -256,8 +274,9 @@ class BuilderMacro {
         if (!extending) return mClass.fields;
 
         mClass = macro class {
-            @:allow($i{prodName})
-            public function new() {
+            @:allow(${classDotPathExpr})
+            @:allow(${classDotPathNoModule})
+            function new() {
                 super();
                 obj = new $typePath();
             }
@@ -275,7 +294,8 @@ class BuilderMacro {
     }
 
     static function makeBuilderFields(
-        product:ClassType, ?useInherited:Bool = false
+        product:ClassType, ?useInherited:Bool = false,
+        productField:String = "obj", buildMethod:String = "build"
     ):Array<Field> {
         var prodFields = getAllProductFields(product, useInherited);
         var newFields = buildBuilderProductFields(prodFields);

@@ -465,7 +465,7 @@ class PrimitiveTools {
             "Invalid pattern: " +
             pattern
         );
-
+        
         var id = ematch.matched(1);
         var args = splitArgs(ematch.matched(2));
         if (e.getName() != id) return false;

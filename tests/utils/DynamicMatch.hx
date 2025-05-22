@@ -9,7 +9,7 @@ using bglib.utils.PrimitiveTools;
 
 /**
  * Enum for testing dynamicMatch.
- **/
+**/
 enum B {
     singleS(a:String);
     doubleS(a:String, b:String);
@@ -21,7 +21,7 @@ enum B {
 
 /**
  * Enum for testing dynamicMatch.
- **/
+**/
 enum A {
     singleS(a:String);
     doubleS(a:String, b:String);
@@ -35,14 +35,14 @@ enum A {
 
 /**
  * class for testing dynamicMatch.
- **/
+**/
 class C {
     public function new() {}
 }
 
 /**
  * typedef for testing dynamicMatch.
- **/
+**/
 typedef ETest = {
     var e:EnumValue;
     var pattern:String;
@@ -50,7 +50,7 @@ typedef ETest = {
 
 /**
  * Tests for dynamic enum matching.
- **/
+**/
 @:asserts
 class DynamicMatch {
     public function new() {}
@@ -71,7 +71,7 @@ class DynamicMatch {
     /**
      * Tests for wildcard (_) matching.
      * @return Assertions
-     **/
+    **/
     public function matchWildcard():Assertions {
         var tests:Array<ETest> = [
             {
@@ -89,6 +89,14 @@ class DynamicMatch {
             {
                 e: B.doubleA(A.singleI(42), A.doubleS("a", "b")),
                 pattern: "doubleA(singleI(_), _)"
+            },
+            {
+                e: B.doubleA(A.singleI(42), A.doubleS("a", "b")),
+                pattern: "doubleA(_, doubleS(a, b))",
+            },
+            {
+                e: A.doubleS("a", "c"),
+                pattern: "doubleS(_, c)",
             }
         ];
         return assertTests(asserts, tests);
@@ -97,7 +105,7 @@ class DynamicMatch {
     /**
      * Tests for basic type matching.
      * @return Assertions
-     **/
+    **/
     public function matchType():Assertions {
         var tests:Array<ETest> = [
             {
@@ -127,7 +135,7 @@ class DynamicMatch {
     /**
      * Tests fo dynamic matching with OR (|).
      * @return Assertions
-     **/
+    **/
     public function matchOrPattern():Assertions {
         var tests:Array<ETest> = [
             {
@@ -157,7 +165,7 @@ class DynamicMatch {
     /**
      * Tests for matches that should fail.
      * @return Assertions
-     **/
+    **/
     public function matchFail():Assertions {
         var tests:Array<ETest> = [
             {
@@ -176,6 +184,18 @@ class DynamicMatch {
                 e: B.singleI(3),
                 pattern: "singleI(4)|singleI(95)|singleI(42)"
             },
+            {
+                e: B.doubleA(A.singleI(42), A.doubleS("a", "c")),
+                pattern: "doubleA(_, doubleS(a, b))",
+            },
+            {
+                e: A.doubleS("a", "c"),
+                pattern: "doubleS(_, b)",
+            },
+            {
+                e: A.doubleS("c", "b"),
+                pattern: "doubleS(a, _)",
+            }
         ];
 
         for (t in tests) {
@@ -191,14 +211,14 @@ class DynamicMatch {
     /**
      * Tests for matches that should throw ParseException.
      * @return Assertions
-     **/
+    **/
     public function matchParseException():Assertions {
         var e = B.singleS("a");
         var tests:Array<ETest> = [
             {
                 e: A.singleS("a"),
                 pattern: "singleS("
-            }
+            } // to many _ or to little _
         ];
 
         for (t in tests) {

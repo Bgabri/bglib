@@ -57,11 +57,7 @@ class Grain {
      * @return TypePath
     **/
     public static function toTypePath(bType:BaseType):TypePath {
-        // TODO: check if this is correct
         var p = bType.module.split(".");
-        // pack.Module.Type
-        // name = "Module"
-        // sub = "Type"
         return {
             pack: bType.pack,
             name: p.pop(),
@@ -102,6 +98,7 @@ class Grain {
     /**
      * Gets the metadata entry from the top of local class.
      * @param name of the metadata
+     * @param required throws an error if the metadata is not found
      * @return MetadataEntry
     **/
     @:noUsing
@@ -129,6 +126,17 @@ class Grain {
         return entry;
     }
 
+    static function toDotPath(expr:Expr):String {
+        switch (expr.expr) {
+            case EConst(CIdent(v)):
+                return v;
+            case EField(e, v, _):
+                return toDotPath(e) + "." + v;
+            case _:
+                throw "invalid expr";
+        }
+    }
+
     static function setMetaExtractField(d:Any, f:MetaParam, p:Expr):Void {
         if (f.extractValue == null || f.extractValue == false) {
             Reflect.setField(d, f.name, p);
@@ -139,13 +147,13 @@ class Grain {
                 Reflect.setField(d, f.name, p.getValue());
                 return;
             }
-            switch (p.expr) {
-                case EConst(CIdent(v)):
-                    var cType = Context.getType(v).getClass();
-                    Reflect.setField(d, f.name, cType);
-                case _:
-                    throw "";
-            }
+            var v = toDotPath(p); // can just use toString but this is safer
+            #if (debug >= 3)
+            @SuppressWarning("checkstyle:Trace")
+            trace(v);
+            #end
+            var cType = Context.getType(v).getClass();
+            Reflect.setField(d, f.name, cType);
         } catch (e) {
             Context.error("Invalid param, expected: " + parseParam(f), p.pos);
         }
